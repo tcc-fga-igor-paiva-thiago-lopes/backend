@@ -14,15 +14,6 @@ def create_app(is_testing=False):
     """
     app = Flask(__name__)
 
-    if is_testing:
-        app.config["TESTING"] = True
-    #     app.config["MONGODB_SETTINGS"] = {
-    #         "host": "mongomock://localhost",
-    #         "db": "measuresoftgram",
-    #     }
-    # else:
-    #     app.config["MONGODB_SETTINGS"] = MONGO_SETTINGS
-
     app.config.from_object("src.config.Config")
 
     db.init_app(app)
