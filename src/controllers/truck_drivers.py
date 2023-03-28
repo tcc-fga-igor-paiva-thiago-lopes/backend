@@ -19,6 +19,13 @@ def list_truck_drivers():
     return list(map(lambda line: line.to_json(), truck_drivers))
 
 
+@truck_driver_controller.route('/<int:truck_driver_id>', methods=['GET'])
+def show_truck_driver(truck_driver_id):
+    truck_driver = TruckDriver.query.get(truck_driver_id)
+
+    return truck_driver.to_json()
+
+
 @truck_driver_controller.route('/', methods=['POST'])
 def register_new_driver():
     request_data = request.get_json(force=True)
