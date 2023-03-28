@@ -19,14 +19,12 @@ def create_app(is_testing=False):
     db.init_app(app)
     migrate.init_app(app,db)
 
-    from src.resources.truck_drivers import TruckDrivers
+    from src.controllers.truck_drivers import truck_driver_controller
+    app.register_blueprint(truck_driver_controller)
 
     cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
     api = Api(app)
-
-    # FIXME: Create routes file
-    api.add_resource(TruckDrivers, "/truck_driver")
 
     # return app, api, db
     return app
