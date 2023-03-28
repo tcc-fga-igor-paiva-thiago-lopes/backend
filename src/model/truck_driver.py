@@ -5,6 +5,7 @@ from src.app import db
 from sqlalchemy.sql import func
 from .application_model import ApplicationModel
 
+
 class TruckDriver(db.Model, ApplicationModel):
     __tablename__ = "TRUCK_DRIVER"
 

@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 migrate = Migrate()
 
+
 def create_app(is_testing=False):
     """
     Create the Flask app
@@ -17,15 +18,14 @@ def create_app(is_testing=False):
     app.config.from_object("src.config.Config")
 
     db.init_app(app)
-    migrate.init_app(app,db)
+    migrate.init_app(app, db)
 
     from src.controllers.truck_drivers import truck_driver_controller
     app.register_blueprint(truck_driver_controller)
 
-    cors = CORS(app, resources={r"/*": {"origins": "*"}})
+    CORS(app, resources={r"/*": {"origins": "*"}})
 
-    api = Api(app)
+    Api(app)  # api =
 
     # return app, api, db
     return app
-
