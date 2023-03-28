@@ -22,7 +22,18 @@ jobs:
         run: pip install tox
 
       - name: Run tests
-        run: tox -- --cov=src --cov-report=xml
+        run: tox -- --cov=src --cov-report=xml --junitxml=junittest.xml
 
       - name: Upload coverage reports to Codecov with GitHub Action
+        if: always()
         uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./
+          env_vars: OS,PYTHON
+          fail_ci_if_error: true
+          files: ./coverage.xml
+          flags: unittests
+          name: backend
+          verbose: true
+
