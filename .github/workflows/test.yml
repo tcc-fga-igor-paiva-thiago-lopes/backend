@@ -1,0 +1,23 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+          cache: pip
+      - name: Install tox
+        run: pip install tox
+      - name: Run tests
+        run: tox -- --cov=src --cov-report=html

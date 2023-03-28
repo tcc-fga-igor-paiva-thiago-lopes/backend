@@ -2,6 +2,7 @@
 !/src/**
 !server.py
 !requirements.txt
+!entrypoint.sh
 
 # caches
 **/__pycache__
