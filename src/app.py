@@ -20,7 +20,7 @@ def create_app(is_testing=False):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from src.controllers.truck_drivers import truck_driver_controller
+    from src.controllers.truck_drivers import controller as truck_driver_controller
     app.register_blueprint(truck_driver_controller)
 
     CORS(app, resources={r"/*": {"origins": "*"}})

@@ -5,28 +5,28 @@ from sqlalchemy.exc import IntegrityError
 from src.model.truck_driver import TruckDriver
 from src.controllers.utils import simple_error_response
 
-truck_driver_controller = Blueprint(
-    "truck_driver_controller",
+controller = Blueprint(
+    "controller",
     __name__,
     url_prefix='/truck-drivers'
 )
 
 
-@truck_driver_controller.route('/', methods=['GET'])
+@controller.route('/', methods=['GET'])
 def list_truck_drivers():
     truck_drivers = TruckDriver.query.all()
 
     return list(map(lambda line: line.to_json(), truck_drivers))
 
 
-@truck_driver_controller.route('/<int:truck_driver_id>', methods=['GET'])
+@controller.route('/<int:truck_driver_id>', methods=['GET'])
 def show_truck_driver(truck_driver_id):
     truck_driver = TruckDriver.query.get(truck_driver_id)
 
     return truck_driver.to_json()
 
 
-@truck_driver_controller.route('/', methods=['POST'])
+@controller.route('/', methods=['POST'])
 def register_new_driver():
     request_data = request.get_json(force=True)
 
