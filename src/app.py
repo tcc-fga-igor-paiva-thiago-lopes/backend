@@ -15,7 +15,11 @@ def create_app(is_testing=False):
     """
     app = Flask(__name__)
 
-    app.config.from_object("src.config.Config")
+    if is_testing:
+        app.config["TESTING"] = True
+        app.config.from_object("src.config.TestConfig")
+    else:
+        app.config.from_object("src.config.Config")
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -25,7 +29,6 @@ def create_app(is_testing=False):
 
     CORS(app, resources={r"/*": {"origins": "*"}})
 
-    Api(app)  # api =
+    Api(app)
 
-    # return app, api, db
     return app

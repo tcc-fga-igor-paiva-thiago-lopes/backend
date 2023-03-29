@@ -1,10 +1,10 @@
 import pytest
-from src.app import create_app
+from src.app import create_app, db
 
 
 @pytest.fixture()
 def app():
-    app, _, _ = create_app(is_testing=True)
+    app = create_app(is_testing=True)
     app.config.update(
         {
             "TESTING": True,
@@ -13,9 +13,16 @@ def app():
 
     # other setup can go here
 
+    with app.app_context():
+        db.create_all()
+
     yield app
 
     # clean up / reset resources here
+
+    # delete everything from database (??)
+    with app.app_context():
+        db.drop_all()
 
 
 @pytest.fixture()
