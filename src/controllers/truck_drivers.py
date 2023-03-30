@@ -6,7 +6,7 @@ from src.model.truck_driver import TruckDriver
 from src.controllers.utils import simple_error_response
 
 controller = Blueprint(
-    "controller",
+    "truck_driver_controller",
     __name__,
     url_prefix='/truck-drivers'
 )
