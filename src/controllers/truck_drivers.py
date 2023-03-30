@@ -12,7 +12,7 @@ controller = Blueprint(
 )
 
 
-@controller.route('/', methods=['GET'])
+@controller.route('', methods=['GET'])
 def list_truck_drivers():
     truck_drivers = TruckDriver.query.all()
 
@@ -26,7 +26,7 @@ def show_truck_driver(truck_driver_id):
     return truck_driver.to_json()
 
 
-@controller.route('/', methods=['POST'])
+@controller.route('', methods=['POST'])
 def register_new_driver():
     request_data = request.get_json(force=True)
 
