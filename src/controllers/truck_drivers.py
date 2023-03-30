@@ -23,6 +23,12 @@ def list_truck_drivers():
 def show_truck_driver(truck_driver_id):
     truck_driver = TruckDriver.query.get(truck_driver_id)
 
+    if truck_driver is None:
+        return simple_error_response(
+            "Usuário não encontrado",
+            requests.codes.not_found
+        )
+
     return truck_driver.to_json()
 
 
