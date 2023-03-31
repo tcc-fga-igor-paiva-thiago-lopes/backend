@@ -1,0 +1,15 @@
+{
+    "explorer.compactFolders": false,
+    "files.trimTrailingWhitespace": true,
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": true,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "[python]": {
+        "editor.tabSize": 4,
+        "editor.formatOnSave": true,
+        "editor.formatOnType": false,
+        "editor.defaultFormatter": "ms-python.python"
+    },
+    "cornflakes.linter.executablePath": "/home/igorbp/.local/bin/flake8",
+    "cornflakes.linter.run": "onSave"
+}
