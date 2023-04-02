@@ -51,14 +51,12 @@ def register_new_driver():
         )
 
     try:
-        truck_driver = TruckDriver(
+        truck_driver = TruckDriver.create(
             name=request_data.get("name"),
             email=request_data.get("email"),
             password=request_data.get("password"),
             password_confirmation=request_data.get("password_confirmation")
         )
-
-        truck_driver.save()
     except IntegrityError:
         return simple_error_response(
             "Email já cadastrado",
