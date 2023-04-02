@@ -1,6 +1,4 @@
 import bcrypt
-import base64
-import hashlib
 from src.app import db
 from sqlalchemy.sql import func
 from .application_model import ApplicationModel
@@ -27,15 +25,15 @@ class TruckDriver(db.Model, ApplicationModel):
         if password != password_confirmation:
             raise Exception('Password and password confirmation must be equal')
 
-        return bcrypt.hashpw(
-            base64.b64encode(
-                hashlib.sha256(password.encode("utf-8")).digest()
-            ),
-            bcrypt.gensalt()
-        )
+        password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+
+        return password_hash.decode('utf8')
 
     def verify_password(self, password):
-        return bcrypt.checkpw(password, self.password_digest)
+        return bcrypt.checkpw(
+            password.encode("utf-8"),
+            self.password_digest.encode("utf-8")
+        )
 
     def to_json(self):
         return {
