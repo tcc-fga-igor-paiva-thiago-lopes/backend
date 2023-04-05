@@ -1,6 +1,8 @@
 import requests
+import jwt
 from flask import request, Blueprint
 from sqlalchemy.exc import IntegrityError
+from src.config import Config
 
 from src.model.truck_driver import TruckDriver
 from src.controllers.utils import simple_error_response
@@ -69,3 +71,41 @@ def register_new_driver():
         )
 
     return truck_driver.to_json(), requests.codes.created
+
+
+@controller.route('/login', methods=['POST'])
+def login():
+    request_data = request.get_json(force=True)
+
+    REQUIRED_FIELDS = ["email", "password"]
+
+    for field in REQUIRED_FIELDS:
+        if request_data.get(field, None) is None:
+            return simple_error_response(
+                f"Email e senha são obrigatórios.",
+                requests.codes.unprocessable_entity
+            )
+
+    email = request_data.get("email")
+
+    truck_driver = TruckDriver.query.filter_by(email=email).first()
+
+    if not truck_driver:
+        return simple_error_response(
+            f"Usuário com email {email} não encontrado.",
+            requests.codes.not_found
+        )
+
+    if (truck_driver.verify_password(request_data.get("password"))):
+
+        truck_driver.login()
+
+        return jwt.encode({
+            'truck_driver_id': truck_driver.id,
+            'ttl': -1
+        }, Config.SECRET_KEY, algorithm='HS256')
+
+    return simple_error_response(
+        "Senha incorreta.",
+        requests.codes.unauthorized
+    )
