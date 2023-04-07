@@ -81,7 +81,7 @@ def login():
     for field in REQUIRED_FIELDS:
         if request_data.get(field, None) is None:
             return simple_error_response(
-                "Email e senha são obrigatórios.",
+                "Email e senha são obrigatórios",
                 requests.codes.unprocessable_entity
             )
 
@@ -91,7 +91,7 @@ def login():
 
     if not truck_driver:
         return simple_error_response(
-            f"Usuário com email {email} não encontrado.",
+            f"Usuário com email {email} não encontrado",
             requests.codes.not_found
         )
 
@@ -108,6 +108,6 @@ def login():
         }, requests.codes.ok
 
     return simple_error_response(
-        "Senha incorreta.",
+        "Senha incorreta",
         requests.codes.unauthorized
     )
