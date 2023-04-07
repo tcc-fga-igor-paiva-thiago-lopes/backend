@@ -4,7 +4,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(object):
-    TESTING = True
     CORS_ORIGINS = "*"
     SECRET_KEY = os.getenv("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
@@ -12,5 +11,7 @@ class Config(object):
 
 
 class TestConfig(object):
+    TESTING = True
+    SECRET_KEY = "chave_secreta"
     SQLALCHEMY_DATABASE_URI = "sqlite://"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
