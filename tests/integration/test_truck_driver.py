@@ -1,3 +1,5 @@
+import jwt
+import requests
 from src.model.truck_driver import TruckDriver
 
 
@@ -7,8 +9,6 @@ login_required_request_params = {
 }
 
 
-# failing test TODO: fix it
-
 def test_login_success(app, client):
     with app.app_context():
         TruckDriver.create(
@@ -17,13 +17,70 @@ def test_login_success(app, client):
             password='password',
             password_confirmation='password'
         )
-        login_success_params = login_required_request_params.copy()
+        params = login_required_request_params.copy()
 
-        login_success_params['email'] = 'jao@mail.com'
-        login_success_params['password'] = 'password'
+        params['email'] = 'jao@mail.com'
+        params['password'] = 'password'
 
-        response = client.post("/truck-drivers/login", json=login_success_params)
+        response = client.post("/truck-drivers/login", json=params)
 
-        assert response.status_code == 200
-        # assert json token (maybe use the JWT lib)
-        # assert response.json["token"] ==
+        assert response.status_code == requests.codes.ok
+        assert jwt.decode(response.json['token'], app.config['SECRET_KEY'],
+                          algorithms=["HS256"])['truck_driver_id'] == 1
+
+
+def test_login_fail_wrong_password(app, client):
+    with app.app_context():
+        TruckDriver.create(
+            name='João',
+            email='jao@mail.com',
+            password='password',
+            password_confirmation='password'
+        )
+        params = login_required_request_params.copy()
+
+        params['email'] = 'jao@mail.com'
+        params['password'] = 'passwordd'
+
+        response = client.post("/truck-drivers/login", json=params)
+
+        assert response.status_code == requests.codes.unauthorized
+        assert response.json['error'] == 'Senha incorreta'
+
+
+def test_login_fail_email_not_registered(app, client):
+    with app.app_context():
+        TruckDriver.create(
+            name='João',
+            email='jao@mail.com',
+            password='password',
+            password_confirmation='password'
+        )
+        params = login_required_request_params.copy()
+
+        params['email'] = 'jaoo@mail.com'
+        params['password'] = 'password'
+
+        response = client.post("/truck-drivers/login", json=params)
+
+        assert response.status_code == requests.codes.not_found
+        assert response.json['error'] == f'Usuário com email {params["email"]} não encontrado'
+
+
+def test_login_fail_missing_required_fields(app, client):
+    with app.app_context():
+        TruckDriver.create(
+            name='João',
+            email='jao@mail.com',
+            password='password',
+            password_confirmation='password'
+        )
+        params = login_required_request_params.copy()
+
+        params['email'] = 'jaoo@mail.com'
+        params.pop('password')
+
+        response = client.post("/truck-drivers/login", json=params)
+
+        assert response.status_code == requests.codes.unprocessable_entity
+        assert response.json['error'] == f'Email e senha são obrigatórios'
