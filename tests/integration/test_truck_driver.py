@@ -9,7 +9,7 @@ login_required_request_params = {
 
 # failing test TODO: fix it
 
-def test_login_success(app):
+def test_login_success(app, client):
     with app.app_context():
         TruckDriver.create(
             name='João',
@@ -22,6 +22,8 @@ def test_login_success(app):
         login_success_params['email'] = 'jao@mail.com'
         login_success_params['password'] = 'password'
 
-        response = app.post("/truck-drivers/login", json=login_success_params)
+        response = client.post("/truck-drivers/login", json=login_success_params)
 
-        assert response.json is not None
+        assert response.status_code == 200
+        # assert json token (maybe use the JWT lib)
+        # assert response.json["token"] ==
