@@ -1,7 +1,9 @@
 import requests
-from flask import request, make_response
-from src.controllers.common.utils import permitted_parameters
 from flask_restful import Resource
+from flask import request, make_response
+
+from src.app import db
+from src.controllers.common.utils import permitted_parameters
 
 
 class ItemAPI(Resource):
@@ -20,7 +22,7 @@ class ItemAPI(Resource):
             return "Não encontrado"
 
     def _get_item(self, id):
-        return self.model.query.get_or_404(id, description=self._not_found_message())
+        return db.get_or_404(self.model, id, description=self._not_found_message())
 
     def get(self, id):
         item = self._get_item(id)
@@ -37,7 +39,7 @@ class ItemAPI(Resource):
         # if errors:
         #     return jsonify(errors), requests.codes.bad_request
 
-        item.update(permitted_parameters(request_data, self.permitted_params))
+        item.update(**permitted_parameters(request_data, self.permitted_params))
 
         return make_response(item.to_json(), requests.codes.ok)
 

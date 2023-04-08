@@ -1,6 +1,7 @@
 import requests
-from flask import request, make_response
 from flask_restful import Resource
+from flask import request, make_response
+from src.app import db
 from src.controllers.common.utils import permitted_parameters
 
 
@@ -13,7 +14,7 @@ class GroupAPI(Resource):
         self.permitted_params = permitted_params
 
     def get(self):
-        items = self.model.query.all()
+        items = db.session.execute(db.select(self.model)).scalars()
 
         return make_response([item.to_json() for item in items], requests.codes.ok)
 
