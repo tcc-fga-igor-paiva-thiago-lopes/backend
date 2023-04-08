@@ -1,10 +1,10 @@
 import requests
-from flask import request, jsonify
-from flask.views import MethodView
+from flask import request, make_response
+from flask_restful import Resource
 from src.controllers.common.utils import permitted_parameters
 
 
-class GroupAPI(MethodView):
+class GroupAPI(Resource):
     init_every_request = False
 
     def __init__(self, model, validator, permitted_params):
@@ -15,7 +15,7 @@ class GroupAPI(MethodView):
     def get(self):
         items = self.model.query.all()
 
-        return jsonify([item.to_json() for item in items])
+        return make_response([item.to_json() for item in items], requests.codes.ok)
 
     def post(self):
         request_data = request.get_json(force=True)
@@ -29,4 +29,4 @@ class GroupAPI(MethodView):
             **permitted_parameters(request_data, self.permitted_params)
         )
 
-        return jsonify(item.to_json()), requests.codes.created
+        return make_response(item.to_json(), requests.codes.created)

@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_cors import CORS
-from flask_restful import Api
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -28,6 +27,5 @@ def create_app(is_testing=False):
     from src.controllers.truck_drivers import controller as truck_driver_controller
     app.register_blueprint(truck_driver_controller)
 
-    Api(app)
 
     return app

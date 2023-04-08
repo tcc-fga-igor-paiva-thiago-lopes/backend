@@ -7,6 +7,9 @@ from .application_model import ApplicationModel
 class TruckDriver(db.Model, ApplicationModel):
     __tablename__ = "TRUCK_DRIVER"
 
+    FRIENDLY_NAME_SINGULAR = "Usuário"
+    FRIENDLY_NAME_PLURAL = "Usuários"
+
     id = db.Column(db.Integer, db.Identity(start=1, cycle=True), primary_key=True)
     name = db.Column(db.String(60), nullable=False)
     email = db.Column(db.String(256), nullable=False, unique=True)

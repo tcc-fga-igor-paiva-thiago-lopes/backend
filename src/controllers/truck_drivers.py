@@ -1,12 +1,13 @@
 import jwt
 import requests
+from flask_restful import Api
+from sqlalchemy.exc import IntegrityError
 from flask import request, current_app, Blueprint
-# from flask.views import MethodView
-# from sqlalchemy.exc import IntegrityError
 
 from src.model.truck_driver import TruckDriver
+from src.controllers.common.item_api import ItemAPI
+from src.controllers.common.group_api import GroupAPI
 from src.controllers.common.utils import simple_error_response
-from src.api import register_default_api
 
 PERMITTED_PARAMS = ["name", "email", "password", "password_confirmation"]
 
@@ -16,13 +17,28 @@ controller = Blueprint(
     url_prefix="/truck-drivers"
 )
 
-register_default_api(
-    app=controller,
-    model=TruckDriver,
-    name="truck-drivers",
-    validator=None,
-    permitted_params=PERMITTED_PARAMS
-)
+api = Api(controller)
+
+
+class TruckDriversAPI(GroupAPI):
+    def post(self):
+        try:
+            super().post()
+        except IntegrityError:
+            return simple_error_response(
+                "Email já cadastrado",
+                requests.codes.unprocessable_entity
+            )
+
+
+resource_kwargs = {
+    "model": TruckDriver,
+    "validator": None,
+    "permitted_params": PERMITTED_PARAMS
+}
+
+api.add_resource(TruckDriversAPI, "/", endpoint="truck_drivers", resource_class_kwargs=resource_kwargs)
+api.add_resource(ItemAPI, "/<int:id>", endpoint="truck_driver", resource_class_kwargs=resource_kwargs)
 
 
 @controller.route("/login", methods=["POST"])
