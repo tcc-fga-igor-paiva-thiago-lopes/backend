@@ -32,6 +32,10 @@ class TruckDriver(db.Model, ApplicationModel):
 
         return password_hash.decode('utf8')
 
+    def login(self):
+        self.last_sign_in_at = func.now()
+        self.save()
+
     def verify_password(self, password):
         return bcrypt.checkpw(
             password.encode("utf-8"),
