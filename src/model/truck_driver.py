@@ -15,19 +15,24 @@ class TruckDriver(ApplicationModel):
     password_digest = db.Column(db.String(512))
     last_sign_in_at = db.Column(db.DateTime(timezone=True))
 
-    def __init__(self, name, email, password, password_confirmation, last_sign_in_at=None):
-        self.name = name
-        self.email = email
-        self.last_sign_in_at = last_sign_in_at
-        self.password_digest = self.digest_password(password, password_confirmation)
+    def __init__(self, **kwargs):
+        password = kwargs.pop("password", None)
+        password_confirmation = kwargs.pop("password_confirmation", None)
 
-    def digest_password(self, password, password_confirmation):
+        if len(password or "") == 0 or len(password_confirmation or "") == 0:
+            raise Exception("Password and password confirmation are required")
+
+        password_digest = self._digest_password(password, password_confirmation)
+
+        return super().__init__(**kwargs, password_digest=password_digest)
+
+    def _digest_password(self, password, password_confirmation):
         if password != password_confirmation:
-            raise Exception('Password and password confirmation must be equal')
+            raise Exception("Password and password confirmation must be equal")
 
         password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
-        return password_hash.decode('utf8')
+        return password_hash.decode("utf8")
 
     def login(self):
         self.last_sign_in_at = func.now()
