@@ -33,3 +33,9 @@ def client(app):
 @pytest.fixture()
 def runner(app):
     return app.test_cli_runner()
+
+
+@pytest.fixture()
+def app_ctx(app):
+    with app.app_context():
+        yield
