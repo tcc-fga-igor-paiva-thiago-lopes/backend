@@ -23,7 +23,7 @@ api = Api(controller)
 class TruckDriversAPI(GroupAPI):
     def post(self):
         try:
-            super().post()
+            return super().post()
         except IntegrityError:
             return simple_error_response(
                 "Email já cadastrado",

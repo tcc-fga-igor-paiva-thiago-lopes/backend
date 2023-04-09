@@ -69,7 +69,7 @@ def test_login_fail_email_not_registered(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_login_fail_missing_required_fields(app, client):
+def test_login_fail_missing_required_fields(client):
     TruckDriver.create(
         name='João',
         email='jao@mail.com',

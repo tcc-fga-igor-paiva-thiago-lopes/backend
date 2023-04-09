@@ -27,5 +27,4 @@ def create_app(is_testing=False):
     from src.controllers.truck_drivers import controller as truck_driver_controller
     app.register_blueprint(truck_driver_controller)
 
-
     return app
