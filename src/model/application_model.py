@@ -18,9 +18,16 @@ class ApplicationModel(db.Model):
 
         return instance
 
+    @classmethod
+    def columns(cls):
+        return [col.name for col in list(cls.__table__.columns)]
+
     def set_attrs(self, **kwargs):
+        columns = self.__class__.columns()
+
         for key, value in kwargs.items():
-            self.__setattr__(key, value)
+            if key in columns:
+                self.__setattr__(key, value)
 
     def save(self):
         if self.id is None:
