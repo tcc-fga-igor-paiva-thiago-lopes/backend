@@ -1,6 +1,6 @@
 import pytest
 import sqlalchemy
-from src.model.truck_driver import TruckDriver
+from src.models.truck_driver import TruckDriver
 
 
 @pytest.mark.usefixtures("app_ctx")

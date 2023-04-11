@@ -1,7 +1,7 @@
 import jwt
 import pytest
 import requests
-from src.model.truck_driver import TruckDriver
+from src.models.truck_driver import TruckDriver
 
 
 login_required_request_params = {

@@ -4,7 +4,7 @@ from flask_restful import Api
 from sqlalchemy.exc import IntegrityError
 from flask import request, current_app, Blueprint
 
-from src.model.truck_driver import TruckDriver
+from src.models.truck_driver import TruckDriver
 from src.controllers.common.item_api import ItemAPI
 from src.controllers.common.group_api import GroupAPI
 from src.controllers.common.utils import simple_error_response
