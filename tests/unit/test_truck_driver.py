@@ -58,3 +58,27 @@ def test_creation_with_different_password():
         )
 
     assert str(error.value) == "Password and password confirmation must be equal"
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_creation_without_password():
+    with pytest.raises(Exception) as error:
+        TruckDriver(
+            name='João',
+            email='jao@mail.com',
+            password_confirmation='12345678'
+        )
+
+    assert str(error.value) == "Password and password confirmation are required"
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_creation_without_password_confirmation():
+    with pytest.raises(Exception) as error:
+        TruckDriver(
+            name='João',
+            email='jao@mail.com',
+            password='password',
+        )
+
+    assert str(error.value) == "Password and password confirmation are required"
