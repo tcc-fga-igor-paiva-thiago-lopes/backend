@@ -20,20 +20,17 @@ controller = Blueprint(
 api = Api(controller)
 
 
-class TruckDriversAPI(GroupAPI):
-    def post(self):
-        try:
-            return super().post()
-        except IntegrityError:
-            return simple_error_response(
-                "Email já cadastrado",
-                requests.codes.unprocessable_entity
-            )
+@controller.errorhandler(IntegrityError)
+def handle_integrity_error(_):
+    return simple_error_response(
+        "Email já cadastrado",
+        requests.codes.unprocessable_entity
+    )
 
 
 resource_kwargs = {"model": TruckDriver, "permitted_params": PERMITTED_PARAMS}
 
-api.add_resource(TruckDriversAPI, "/", endpoint="truck_drivers", resource_class_kwargs=resource_kwargs)
+api.add_resource(GroupAPI, "/", endpoint="truck_drivers", resource_class_kwargs=resource_kwargs)
 api.add_resource(ItemAPI, "/<int:id>", endpoint="truck_driver", resource_class_kwargs=resource_kwargs)
 
 
