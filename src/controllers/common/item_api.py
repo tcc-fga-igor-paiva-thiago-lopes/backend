@@ -9,9 +9,8 @@ from src.controllers.common.utils import permitted_parameters
 class ItemAPI(Resource):
     init_every_request = False
 
-    def __init__(self, model, validator, permitted_params, not_found_msg=None):
+    def __init__(self, model, permitted_params, not_found_msg=None):
         self.model = model
-        self.validator = validator
         self.permitted_params = permitted_params
         self.not_found_msg = not_found_msg
 
@@ -33,11 +32,6 @@ class ItemAPI(Resource):
         item = self._get_item(id)
 
         request_data = request.get_json(force=True)
-
-        # errors = self.validator.validate(item, request.json)
-
-        # if errors:
-        #     return jsonify(errors), requests.codes.bad_request
 
         item.update(**permitted_parameters(request_data, self.permitted_params))
 

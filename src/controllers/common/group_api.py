@@ -8,9 +8,8 @@ from src.controllers.common.utils import permitted_parameters
 class GroupAPI(Resource):
     init_every_request = False
 
-    def __init__(self, model, validator, permitted_params):
+    def __init__(self, model, permitted_params):
         self.model = model
-        self.validator = validator
         self.permitted_params = permitted_params
 
     def get(self):
@@ -20,11 +19,6 @@ class GroupAPI(Resource):
 
     def post(self):
         request_data = request.get_json(force=True)
-
-        # errors = self.validator.validate(request.json)
-
-        # if errors:
-        #     return jsonify(errors), 400
 
         item = self.model.create(
             **permitted_parameters(request_data, self.permitted_params)

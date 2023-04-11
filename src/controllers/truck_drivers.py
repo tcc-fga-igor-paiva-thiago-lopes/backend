@@ -31,11 +31,7 @@ class TruckDriversAPI(GroupAPI):
             )
 
 
-resource_kwargs = {
-    "model": TruckDriver,
-    "validator": None,
-    "permitted_params": PERMITTED_PARAMS
-}
+resource_kwargs = {"model": TruckDriver, "permitted_params": PERMITTED_PARAMS}
 
 api.add_resource(TruckDriversAPI, "/", endpoint="truck_drivers", resource_class_kwargs=resource_kwargs)
 api.add_resource(ItemAPI, "/<int:id>", endpoint="truck_driver", resource_class_kwargs=resource_kwargs)
