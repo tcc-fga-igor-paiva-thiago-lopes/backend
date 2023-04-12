@@ -1,4 +1,6 @@
-from flask import make_response
+import requests
+from functools import wraps
+from flask import make_response, request
 
 
 def simple_error_response(msg, status, key="message"):
@@ -28,3 +30,24 @@ def missing_required_fields(request_data, required_fields):
 
 def missing_required_fields_msg(missing_fields):
     return f"Os seguintes campos são obrigatórios: {', '.join(missing_fields)}"
+
+
+def required_fields(required_fields):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            request_data = request.get_json(force=True, cache=True)
+
+            missing_fields = missing_required_fields(request_data, required_fields)
+
+            if len(missing_fields) > 0:
+                return simple_error_response(
+                    missing_required_fields_msg(missing_fields),
+                    requests.codes.unprocessable_entity,
+                )
+
+            return f(*args, **kwargs)
+
+        return decorated_function
+
+    return decorator

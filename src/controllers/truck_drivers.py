@@ -8,11 +8,7 @@ from src.app import db
 from src.models.truck_driver import TruckDriver
 from src.controllers.common.item_api import ItemAPI
 from src.controllers.common.group_api import GroupAPI
-from src.controllers.common.utils import (
-    simple_error_response,
-    missing_required_fields,
-    missing_required_fields_msg,
-)
+from src.controllers.common.utils import required_fields, simple_error_response
 
 PERMITTED_PARAMS = ["name", "email", "password", "password_confirmation"]
 
@@ -41,27 +37,16 @@ api.add_resource(
 
 
 @controller.route("/login", methods=["POST"])
+@required_fields([("email", "e-mail"), ("password", "senha")])
 def login():
-    request_data = request.get_json(force=True)
-
-    REQUIRED_FIELDS = [("email", "e-mail"), ("password", "senha")]
-
-    missing_fields = missing_required_fields(request_data, REQUIRED_FIELDS)
-
-    if len(missing_fields) > 0:
-        return simple_error_response(
-            missing_required_fields_msg(missing_fields),
-            requests.codes.unprocessable_entity,
-        )
-
-    email = request_data.get("email")
+    email = request.json.get("email")
 
     truck_driver = db.first_or_404(
         db.select(TruckDriver).filter_by(email=email),
         description=f"Usuário com e-mail {email} não encontrado",
     )
 
-    if truck_driver.verify_password(request_data.get("password")):
+    if truck_driver.verify_password(request.json.get("password")):
         truck_driver.login()
 
         return {
