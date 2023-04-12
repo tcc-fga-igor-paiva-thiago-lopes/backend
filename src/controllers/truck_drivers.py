@@ -6,7 +6,6 @@ from flask import request, current_app, Blueprint
 
 from src.app import db
 from src.models.truck_driver import TruckDriver
-from src.controllers.common.item_api import ItemAPI
 from src.controllers.common.group_api import GroupAPI
 from src.controllers.common.utils import required_fields, simple_error_response
 
@@ -29,10 +28,11 @@ def handle_integrity_error(_):
 resource_kwargs = {"model": TruckDriver, "permitted_params": PERMITTED_PARAMS}
 
 api.add_resource(
-    GroupAPI, "/", endpoint="truck_drivers", resource_class_kwargs=resource_kwargs
-)
-api.add_resource(
-    ItemAPI, "/<int:id>", endpoint="truck_driver", resource_class_kwargs=resource_kwargs
+    GroupAPI,
+    "/",
+    endpoint="truck_drivers",
+    resource_class_kwargs=resource_kwargs,
+    methods=["POST"],
 )
 
 
