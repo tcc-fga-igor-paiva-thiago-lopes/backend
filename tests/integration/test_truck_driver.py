@@ -83,4 +83,4 @@ def test_login_fail_missing_required_fields(app, client):
         response = client.post("/truck-drivers/login", json=params)
 
         assert response.status_code == requests.codes.unprocessable_entity
-        assert response.json['error'] == f'Email e senha são obrigatórios'
+        assert response.json['error'] == 'Email e senha são obrigatórios'
