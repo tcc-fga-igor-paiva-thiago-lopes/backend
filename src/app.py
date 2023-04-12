@@ -37,9 +37,12 @@ def create_app(is_testing=False):
 
             return response
 
-        return simple_error_response("Erro interno do servidor", requests.codes.internal_server_error)
+        return simple_error_response(
+            "Erro interno do servidor", requests.codes.internal_server_error
+        )
 
     from src.controllers.truck_drivers import controller as truck_drivers_controller
+
     app.register_blueprint(truck_drivers_controller)
 
     return app

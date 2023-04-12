@@ -8,7 +8,7 @@
         "editor.tabSize": 4,
         "editor.formatOnSave": true,
         "editor.formatOnType": false,
-        "editor.defaultFormatter": "ms-python.python"
+        "editor.defaultFormatter": "ms-python.black-formatter"
     },
     "cornflakes.linter.executablePath": "/home/igorbp/.local/bin/flake8",
     "cornflakes.linter.run": "onSave"

@@ -16,7 +16,10 @@ class ItemAPI(Resource):
 
     def _not_found_message(self):
         try:
-            return self.not_found_msg or f"{self.model.FRIENDLY_NAME_SINGULAR} não encontrado"
+            return (
+                self.not_found_msg
+                or f"{self.model.FRIENDLY_NAME_SINGULAR} não encontrado"
+            )
         except AttributeError:
             return "Não encontrado"
 

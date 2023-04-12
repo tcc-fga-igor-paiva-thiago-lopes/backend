@@ -40,8 +40,7 @@ class TruckDriver(ApplicationModel):
 
     def verify_password(self, password):
         return bcrypt.checkpw(
-            password.encode("utf-8"),
-            self.password_digest.encode("utf-8")
+            password.encode("utf-8"), self.password_digest.encode("utf-8")
         )
 
     def to_json(self):
@@ -51,5 +50,5 @@ class TruckDriver(ApplicationModel):
             "email": self.email,
             "last_sign_in_at": str(self.last_sign_in_at),
             "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at)
+            "updated_at": str(self.updated_at),
         }
