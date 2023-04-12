@@ -64,7 +64,7 @@ def test_login_fail_email_not_registered(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_login_fail_missing_required_fields(client):
+def test_login_fail_missing_password(client):
     TruckDriver.create(
         name="João",
         email="jao@mail.com",
@@ -76,5 +76,44 @@ def test_login_fail_missing_required_fields(client):
 
     response = client.post("/truck-drivers/login", json=params)
 
-    assert response.status_code == requests.codes.unprocessable_entity
+    assert response.status_code == requests.codes.bad_request
     assert response.json["message"] == "Os seguintes campos são obrigatórios: senha"
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_login_fail_missing_email(client):
+    TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    params = {"password": "password"}
+
+    response = client.post("/truck-drivers/login", json=params)
+
+    assert response.status_code == requests.codes.bad_request
+    assert response.json["message"] == "Os seguintes campos são obrigatórios: e-mail"
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_creation_with_duplicated_email(client):
+    TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    params = {
+        "name": "Carlos",
+        "email": "jao@mail.com",
+        "password": "123",
+        "password_confirmation": "123",
+    }
+
+    response = client.post("/truck-drivers", json=params, follow_redirects=True)
+
+    assert response.status_code == requests.codes.unprocessable_entity
+    assert response.json["message"] == "Email já cadastrado"
