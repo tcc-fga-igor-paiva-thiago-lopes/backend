@@ -1,5 +1,6 @@
 import requests
-from flask import request, Blueprint
+import jwt
+from flask import request, current_app, Blueprint
 from sqlalchemy.exc import IntegrityError
 
 from src.model.truck_driver import TruckDriver
@@ -8,18 +9,18 @@ from src.controllers.utils import simple_error_response
 controller = Blueprint(
     "truck_driver_controller",
     __name__,
-    url_prefix='/truck-drivers'
+    url_prefix="/truck-drivers"
 )
 
 
-@controller.route('', methods=['GET'])
+@controller.route("", methods=["GET"])
 def list_truck_drivers():
     truck_drivers = TruckDriver.query.all()
 
     return list(map(lambda line: line.to_json(), truck_drivers))
 
 
-@controller.route('/<int:truck_driver_id>', methods=['GET'])
+@controller.route("/<int:truck_driver_id>", methods=["GET"])
 def show_truck_driver(truck_driver_id):
     truck_driver = TruckDriver.query.get(truck_driver_id)
 
@@ -32,7 +33,7 @@ def show_truck_driver(truck_driver_id):
     return truck_driver.to_json()
 
 
-@controller.route('', methods=['POST'])
+@controller.route("", methods=["POST"])
 def register_new_driver():
     request_data = request.get_json(force=True)
 
@@ -69,3 +70,44 @@ def register_new_driver():
         )
 
     return truck_driver.to_json(), requests.codes.created
+
+
+@controller.route("/login", methods=["POST"])
+def login():
+    request_data = request.get_json(force=True)
+
+    REQUIRED_FIELDS = ["email", "password"]
+
+    for field in REQUIRED_FIELDS:
+        if request_data.get(field, None) is None:
+            return simple_error_response(
+                "Email e senha são obrigatórios",
+                requests.codes.unprocessable_entity
+            )
+
+    email = request_data.get("email")
+
+    truck_driver = TruckDriver.query.filter_by(email=email).first()
+
+    if not truck_driver:
+        return simple_error_response(
+            f"Usuário com email {email} não encontrado",
+            requests.codes.not_found
+        )
+
+    if (truck_driver.verify_password(request_data.get("password"))):
+
+        truck_driver.login()
+
+        return {
+            "token": jwt.encode(
+                {"truck_driver_id": truck_driver.id, "ttl": -1},
+                current_app.config["SECRET_KEY"],
+                algorithm="HS256"
+            ),
+        }, requests.codes.ok
+
+    return simple_error_response(
+        "Senha incorreta",
+        requests.codes.unauthorized
+    )
