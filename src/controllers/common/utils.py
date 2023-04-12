@@ -43,7 +43,7 @@ def required_fields(required_fields):
             if len(missing_fields) > 0:
                 return simple_error_response(
                     missing_required_fields_msg(missing_fields),
-                    requests.codes.unprocessable_entity,
+                    requests.codes.bad_request,
                 )
 
             return f(*args, **kwargs)
