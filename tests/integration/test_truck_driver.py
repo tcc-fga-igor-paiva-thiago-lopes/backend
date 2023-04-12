@@ -3,12 +3,6 @@ import requests
 from src.model.truck_driver import TruckDriver
 
 
-login_required_request_params = {
-    "email": "",
-    'password': ""
-}
-
-
 def test_login_success(app, client):
     with app.app_context():
         TruckDriver.create(
@@ -17,10 +11,11 @@ def test_login_success(app, client):
             password='password',
             password_confirmation='password'
         )
-        params = login_required_request_params.copy()
 
-        params['email'] = 'jao@mail.com'
-        params['password'] = 'password'
+        params = {
+            "email": "jao@mail.com",
+            "password": "password"
+        }
 
         response = client.post("/truck-drivers/login", json=params)
 
@@ -37,10 +32,11 @@ def test_login_fail_wrong_password(app, client):
             password='password',
             password_confirmation='password'
         )
-        params = login_required_request_params.copy()
 
-        params['email'] = 'jao@mail.com'
-        params['password'] = 'passwordd'
+        params = {
+            "email": "jao@mail.com",
+            "password": "passwordd"
+        }
 
         response = client.post("/truck-drivers/login", json=params)
 
@@ -56,10 +52,11 @@ def test_login_fail_email_not_registered(app, client):
             password='password',
             password_confirmation='password'
         )
-        params = login_required_request_params.copy()
 
-        params['email'] = 'jaoo@mail.com'
-        params['password'] = 'password'
+        params = {
+            "email": "jaoo@mail.com",
+            "password": "password"
+        }
 
         response = client.post("/truck-drivers/login", json=params)
 
@@ -75,10 +72,10 @@ def test_login_fail_missing_required_fields(app, client):
             password='password',
             password_confirmation='password'
         )
-        params = login_required_request_params.copy()
 
-        params['email'] = 'jaoo@mail.com'
-        params.pop('password')
+        params = {
+            "email": "jao@mail.com"
+        }
 
         response = client.post("/truck-drivers/login", json=params)
 
