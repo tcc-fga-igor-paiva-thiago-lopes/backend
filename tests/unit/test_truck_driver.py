@@ -1,5 +1,7 @@
 import pytest
 import sqlalchemy
+
+from src.app import db
 from src.models.truck_driver import TruckDriver
 
 
@@ -78,3 +80,34 @@ def test_creation_without_password_confirmation():
         )
 
     assert str(error.value) == "Password and password confirmation are required"
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_truck_driver_partial_update():
+    truck_driver = TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="12345678",
+        password_confirmation="12345678",
+    )
+
+    truck_driver.update(name="João Silva")
+
+    assert truck_driver.name == "João Silva"
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_truck_driver_removal():
+    truck_driver = TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="12345678",
+        password_confirmation="12345678",
+    )
+
+    truck_driver.destroy()
+
+    with pytest.raises(sqlalchemy.exc.NoResultFound):
+        db.session.execute(
+            db.select(TruckDriver).filter_by(email=truck_driver.email)
+        ).scalar_one()
