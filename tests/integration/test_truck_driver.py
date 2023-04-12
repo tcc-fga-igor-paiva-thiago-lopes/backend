@@ -40,7 +40,7 @@ def test_login_fail_wrong_password(client):
     response = client.post("/truck-drivers/login", json=params)
 
     assert response.status_code == requests.codes.unauthorized
-    assert response.json["error"] == "Senha incorreta"
+    assert response.json["message"] == "Usuário ou senha incorretos"
 
 
 @pytest.mark.usefixtures("app_ctx")
@@ -58,7 +58,8 @@ def test_login_fail_email_not_registered(client):
 
     assert response.status_code == requests.codes.not_found
     assert (
-        response.json["error"] == f'Usuário com email {params["email"]} não encontrado'
+        response.json["message"]
+        == f'Usuário com e-mail {params["email"]} não encontrado'
     )
 
 
@@ -76,4 +77,4 @@ def test_login_fail_missing_required_fields(client):
     response = client.post("/truck-drivers/login", json=params)
 
     assert response.status_code == requests.codes.unprocessable_entity
-    assert response.json["error"] == "Email e senha são obrigatórios"
+    assert response.json["message"] == "Os seguintes campos são obrigatórios: senha"
