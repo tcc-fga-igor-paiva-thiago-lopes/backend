@@ -9,10 +9,11 @@ from src.controllers.common.utils import permitted_parameters
 class ItemAPI(Resource):
     init_every_request = False
 
-    def __init__(self, model, permitted_params, not_found_msg=None):
+    def __init__(self, model, permitted_params, model_schema, not_found_msg=None):
         self.model = model
         self.permitted_params = permitted_params
         self.not_found_msg = not_found_msg
+        self.item_schema = model_schema()
 
     def _not_found_message(self):
         try:
@@ -29,7 +30,7 @@ class ItemAPI(Resource):
     def get(self, id):
         item = self._get_item(id)
 
-        return make_response(item.to_json(), requests.codes.ok)
+        return make_response(self.item_schema.dump(item), requests.codes.ok)
 
     def patch(self, id):
         item = self._get_item(id)
@@ -38,7 +39,7 @@ class ItemAPI(Resource):
 
         item.update(**permitted_parameters(request_data, self.permitted_params))
 
-        return make_response(item.to_json(), requests.codes.ok)
+        return make_response(self.item_schema.dump(item), requests.codes.ok)
 
     def delete(self, id):
         item = self._get_item(id)

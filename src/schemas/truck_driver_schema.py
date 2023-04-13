@@ -8,6 +8,7 @@ from src.schemas.base_schema import BaseSchema
 class TruckDriverSchema(BaseSchema):
     class Meta(BaseSchema.Meta):
         model = TruckDriver
+        # Had to disable load_instance because it fails using password and password_confirmation
         load_instance = False
         exclude = ("password_digest",)
         additional = ("password", "password_confirmation")
@@ -20,11 +21,10 @@ class TruckDriverSchema(BaseSchema):
     def make_truck_driver(self, data, **kwargs):
         model = self.__class__.Meta.model
 
-        if kwargs.get("partial", None):
-            return db.one_or_404(
-                db.select(model).filter_by(**data),
-                description=f"{model.FRIENDLY_NAME_SINGULAR} não encontrado",
-            )
+        if data.get("id", None) is not None:
+            not_found_msg = f"{model.FRIENDLY_NAME_SINGULAR} não encontrado"
+
+            return db.get_or_404(model, data["id"], description=not_found_msg)
 
         return model(**data)
 

@@ -7,6 +7,16 @@ def simple_error_response(msg, status, key="message"):
     return make_response({key: msg}, status)
 
 
+def validation_error_response(
+    validation_error,
+    msg,
+    status=requests.codes.bad_request,
+    msg_key="message",
+    errors_key="errors",
+):
+    return make_response({msg_key: msg, errors_key: validation_error.messages}, status)
+
+
 def permitted_parameters(request_data, permitted_params):
     filtered_data = {}
 
