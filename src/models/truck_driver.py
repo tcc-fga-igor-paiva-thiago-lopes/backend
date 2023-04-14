@@ -42,13 +42,3 @@ class TruckDriver(ApplicationModel):
         return bcrypt.checkpw(
             password.encode("utf-8"), self.password_digest.encode("utf-8")
         )
-
-    def to_json(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "email": self.email,
-            "last_sign_in_at": str(self.last_sign_in_at),
-            "created_at": str(self.created_at),
-            "updated_at": str(self.updated_at),
-        }
