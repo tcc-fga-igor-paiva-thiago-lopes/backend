@@ -15,6 +15,9 @@ class BaseSchema(SQLAlchemyAutoSchema):
         include_fk = True
         unknown = EXCLUDE
 
+    created_at = fields.DateTime(dump_only=True)
+    updated_at = fields.DateTime(dump_only=True)
+
     @pre_load
     def filter_data(self, data, **_):
         return dict(filter(lambda pair: pair[0] != "id", data.items()))
