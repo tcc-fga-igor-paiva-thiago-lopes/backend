@@ -1,6 +1,5 @@
 from marshmallow import fields, post_load
 
-from src.app import db
 from src.models.truck_driver import TruckDriver
 from src.schemas.base_schema import BaseSchema
 
@@ -18,13 +17,8 @@ class TruckDriverSchema(BaseSchema):
     )
 
     @post_load
-    def make_truck_driver(self, data, **kwargs):
+    def make_truck_driver(self, data, **_):
         model = self.__class__.Meta.model
-
-        if data.get("id", None) is not None:
-            not_found_msg = f"{model.FRIENDLY_NAME_SINGULAR} não encontrado"
-
-            return db.get_or_404(model, data["id"], description=not_found_msg)
 
         return model(**data)
 

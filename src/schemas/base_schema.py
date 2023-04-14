@@ -1,5 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import fields, EXCLUDE
+from marshmallow import fields, EXCLUDE, pre_load
+
 from src.app import db
 
 fields.Field.default_error_messages["required"] = "campo obrigatório não informado"
@@ -14,15 +15,18 @@ class BaseSchema(SQLAlchemyAutoSchema):
         include_fk = True
         unknown = EXCLUDE
 
+    @pre_load
+    def filter_data(self, data, **_):
+        return dict(filter(lambda pair: pair[0] != "id", data.items()))
+
     def load(self, data, **kwargs):
         if isinstance(data, int):
-            kwargs["partial"] = True
+            model = self.__class__.Meta.model
 
-            return super().load({"id": data}, **kwargs)
-
-        if data.get("id", None) is not None:
-            kwargs["partial"] = True
-
-            return super().load({"id": data["id"]}, **kwargs)
+            return db.get_or_404(
+                model,
+                data,
+                description=f"{model.FRIENDLY_NAME_SINGULAR} não encontrado",
+            )
 
         return super().load(data, **kwargs)
