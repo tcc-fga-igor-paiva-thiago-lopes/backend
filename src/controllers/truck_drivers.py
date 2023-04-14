@@ -1,113 +1,62 @@
-import requests
 import jwt
-from flask import request, current_app, Blueprint
+import requests
+from flask_restful import Api
 from sqlalchemy.exc import IntegrityError
+from flask import request, current_app, Blueprint
 
-from src.model.truck_driver import TruckDriver
-from src.controllers.utils import simple_error_response
+from src.app import db
+from src.models.truck_driver import TruckDriver
+from src.controllers.common.group_api import GroupAPI
+from src.controllers.common.utils import required_fields, simple_error_response
+
+PERMITTED_PARAMS = ["name", "email", "password", "password_confirmation"]
 
 controller = Blueprint(
-    "truck_driver_controller",
-    __name__,
-    url_prefix="/truck-drivers"
+    "truck_drivers_controller", __name__, url_prefix="/truck-drivers"
+)
+
+api = Api(controller)
+
+
+@controller.errorhandler(IntegrityError)
+def handle_integrity_error(_):
+    return simple_error_response(
+        "Email já cadastrado", requests.codes.unprocessable_entity
+    )
+
+
+resource_kwargs = {"model": TruckDriver, "permitted_params": PERMITTED_PARAMS}
+
+api.add_resource(
+    GroupAPI,
+    "/",
+    endpoint="truck_drivers",
+    resource_class_kwargs=resource_kwargs,
+    methods=["POST"],
 )
 
 
-@controller.route("", methods=["GET"])
-def list_truck_drivers():
-    truck_drivers = TruckDriver.query.all()
-
-    return list(map(lambda line: line.to_json(), truck_drivers))
-
-
-@controller.route("/<int:truck_driver_id>", methods=["GET"])
-def show_truck_driver(truck_driver_id):
-    truck_driver = TruckDriver.query.get(truck_driver_id)
-
-    if truck_driver is None:
-        return simple_error_response(
-            "Usuário não encontrado",
-            requests.codes.not_found
-        )
-
-    return truck_driver.to_json()
-
-
-@controller.route("", methods=["POST"])
-def register_new_driver():
-    request_data = request.get_json(force=True)
-
-    REQUIRED_FIELDS = ["name", "email", "password", "password_confirmation"]
-
-    missing_fields = []
-
-    for field in REQUIRED_FIELDS:
-        if request_data.get(field, None) is None:
-            missing_fields.append(field)
-
-    if len(missing_fields) > 0:
-        return simple_error_response(
-            f"Os seguintes campos são obrigatórios: {', '.join(missing_fields)}.",
-            requests.codes.unprocessable_entity
-        )
-
-    try:
-        truck_driver = TruckDriver.create(
-            name=request_data.get("name"),
-            email=request_data.get("email"),
-            password=request_data.get("password"),
-            password_confirmation=request_data.get("password_confirmation")
-        )
-    except IntegrityError:
-        return simple_error_response(
-            "Email já cadastrado",
-            requests.codes.unprocessable_entity
-        )
-    except Exception as error:
-        return simple_error_response(
-            f"Falha ao salvar usuário: {error}",
-            requests.codes.unprocessable_entity
-        )
-
-    return truck_driver.to_json(), requests.codes.created
-
-
 @controller.route("/login", methods=["POST"])
+@required_fields([("email", "e-mail"), ("password", "senha")])
 def login():
-    request_data = request.get_json(force=True)
+    email = request.json.get("email")
 
-    REQUIRED_FIELDS = ["email", "password"]
+    truck_driver = db.first_or_404(
+        db.select(TruckDriver).filter_by(email=email),
+        description=f"Usuário com e-mail {email} não encontrado",
+    )
 
-    for field in REQUIRED_FIELDS:
-        if request_data.get(field, None) is None:
-            return simple_error_response(
-                "Email e senha são obrigatórios",
-                requests.codes.unprocessable_entity
-            )
-
-    email = request_data.get("email")
-
-    truck_driver = TruckDriver.query.filter_by(email=email).first()
-
-    if not truck_driver:
-        return simple_error_response(
-            f"Usuário com email {email} não encontrado",
-            requests.codes.not_found
-        )
-
-    if (truck_driver.verify_password(request_data.get("password"))):
-
+    if truck_driver.verify_password(request.json.get("password")):
         truck_driver.login()
 
         return {
             "token": jwt.encode(
                 {"truck_driver_id": truck_driver.id, "ttl": -1},
                 current_app.config["SECRET_KEY"],
-                algorithm="HS256"
+                algorithm="HS256",
             ),
         }, requests.codes.ok
 
     return simple_error_response(
-        "Senha incorreta",
-        requests.codes.unauthorized
+        "Usuário ou senha incorretos", requests.codes.unauthorized
     )

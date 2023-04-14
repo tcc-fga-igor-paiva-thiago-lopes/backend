@@ -53,6 +53,12 @@ pip install pytest-mock
 To run tests and check code coverage:
 
 ```
+# Text
+tox -- --cov=src
+
+# The result will be printed on the screen
+
+# HTML
 tox -- --cov=src --cov-report=html:cov_html
 
 # Check cov_html/index.html to see coverage info
