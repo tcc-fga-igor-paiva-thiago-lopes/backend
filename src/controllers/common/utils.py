@@ -18,13 +18,7 @@ def validation_error_response(
 
 
 def permitted_parameters(request_data, permitted_params):
-    filtered_data = {}
-
-    for param, value in request_data.items():
-        if param in permitted_params:
-            filtered_data[param] = value
-
-    return filtered_data
+    return dict(filter(lambda pair: pair[0] in permitted_params, request_data.items()))
 
 
 def missing_required_fields(request_data, required_fields):
