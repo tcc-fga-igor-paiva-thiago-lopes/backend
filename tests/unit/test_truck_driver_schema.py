@@ -41,7 +41,7 @@ def test_truck_driver_load():
     assert truck_driver.id is None
     assert truck_driver.created_at is None
     assert truck_driver.updated_at is None
-    assert truck_driver.last_sign_in_at.isoformat() == date_time
+    assert truck_driver.last_sign_in_at is None
 
     truck_driver.save()
 
