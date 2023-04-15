@@ -1,5 +1,7 @@
+import pytz
 import pytest
 import sqlalchemy
+from datetime import datetime, timedelta
 
 from src.app import db
 from src.models.truck_driver import TruckDriver
@@ -14,8 +16,14 @@ def test_creation():
         password_confirmation="password",
     )
 
+    datetime_now = datetime.now(pytz.timezone("UTC"))
+
     assert truck_driver.id == 1
     assert truck_driver.email == "jao@mail.com"
+    assert truck_driver.updated_at is None
+    assert abs(
+        datetime_now - truck_driver.created_at.replace(tzinfo=pytz.UTC)
+    ) < timedelta(minutes=1)
 
 
 @pytest.mark.usefixtures("app_ctx")
@@ -91,9 +99,16 @@ def test_truck_driver_partial_update():
         password_confirmation="12345678",
     )
 
+    assert truck_driver.updated_at is None
+
     truck_driver.update(name="João Silva")
 
+    datetime_now = datetime.now(pytz.timezone("UTC"))
+
     assert truck_driver.name == "João Silva"
+    assert abs(
+        datetime_now - truck_driver.updated_at.replace(tzinfo=pytz.UTC)
+    ) < timedelta(minutes=1)
 
 
 @pytest.mark.usefixtures("app_ctx")
