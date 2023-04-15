@@ -12,6 +12,7 @@ class TruckDriverSchema(BaseSchema):
         exclude = ("password_digest",)
         additional = ("password", "password_confirmation")
 
+    last_sign_in_at = fields.DateTime(dump_only=True)
     email = fields.Email(
         required=True, error_messages={"invalid": "Não é um endereço de e-mail válido"}
     )
