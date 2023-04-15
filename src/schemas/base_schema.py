@@ -1,5 +1,5 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import fields, EXCLUDE, pre_load
+from marshmallow import fields, EXCLUDE
 
 from src.app import db
 
@@ -15,12 +15,9 @@ class BaseSchema(SQLAlchemyAutoSchema):
         include_fk = True
         unknown = EXCLUDE
 
+    id = fields.Integer(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
-
-    @pre_load
-    def filter_data(self, data, **_):
-        return dict(filter(lambda pair: pair[0] != "id", data.items()))
 
     def load(self, data, **kwargs):
         if isinstance(data, int):
