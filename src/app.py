@@ -3,12 +3,14 @@ from flask import Flask, json
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
 from werkzeug.exceptions import HTTPException
 
 from src.controllers.common.utils import simple_error_response
 
 db = SQLAlchemy()
 migrate = Migrate()
+ma = Marshmallow()
 
 
 def create_app(is_testing=False):
@@ -26,6 +28,7 @@ def create_app(is_testing=False):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    ma.init_app(app)
 
     @app.errorhandler(Exception)
     def handle_exception(e):

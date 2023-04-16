@@ -1,13 +1,19 @@
 import jwt
 import requests
 from flask_restful import Api
+from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 from flask import request, current_app, Blueprint
 
 from src.app import db
 from src.models.truck_driver import TruckDriver
 from src.controllers.common.group_api import GroupAPI
-from src.controllers.common.utils import required_fields, simple_error_response
+from src.controllers.common.utils import (
+    required_fields,
+    simple_error_response,
+    validation_error_response,
+)
+from src.schemas.truck_driver_schema import TruckDriverSchema
 
 PERMITTED_PARAMS = ["name", "email", "password", "password_confirmation"]
 
@@ -25,7 +31,16 @@ def handle_integrity_error(_):
     )
 
 
-resource_kwargs = {"model": TruckDriver, "permitted_params": PERMITTED_PARAMS}
+@controller.errorhandler(ValidationError)
+def handle_validation_error(error):
+    return validation_error_response(error, "Falha ao validar usuário")
+
+
+resource_kwargs = {
+    "model": TruckDriver,
+    "permitted_params": PERMITTED_PARAMS,
+    "model_schema": TruckDriverSchema,
+}
 
 api.add_resource(
     GroupAPI,
