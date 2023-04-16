@@ -1,11 +1,14 @@
-import jwt
 import requests
 from flask_restful import Api
-from marshmallow import ValidationError
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    current_user,
+)
 from sqlalchemy.exc import IntegrityError
-from flask import request, current_app, Blueprint
+from flask import request, Blueprint
 
-from src.app import db
+from src.app import db, jwt
 from src.models.truck_driver import TruckDriver
 from src.controllers.common.group_api import GroupAPI
 from src.controllers.common.utils import (
@@ -65,13 +68,15 @@ def login():
         truck_driver.login()
 
         return {
-            "token": jwt.encode(
-                {"truck_driver_id": truck_driver.id, "ttl": -1},
-                current_app.config["SECRET_KEY"],
-                algorithm="HS256",
-            ),
+            "token": create_access_token(identity=truck_driver.id),
         }, requests.codes.ok
 
     return simple_error_response(
         "Usuário ou senha incorretos", requests.codes.unauthorized
     )
+
+
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    return db.first_or_404(TruckDriver.query.filter_by(id=identity))
