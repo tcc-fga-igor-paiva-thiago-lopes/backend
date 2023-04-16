@@ -1,6 +1,6 @@
-import jwt
 import pytest
 import requests
+from flask_jwt_extended import decode_token
 from src.models.truck_driver import TruckDriver
 
 
@@ -18,12 +18,8 @@ def test_login_success(app, client):
     response = client.post("/truck-drivers/login", json=params)
 
     assert response.status_code == requests.codes.ok
-    assert (
-        jwt.decode(
-            response.json["token"], app.config["SECRET_KEY"], algorithms=["HS256"]
-        )["truck_driver_id"]
-        == 1
-    )
+    print(decode_token(response.json["token"]))
+    assert decode_token(response.json["token"])["sub"] == 1
 
 
 @pytest.mark.usefixtures("app_ctx")

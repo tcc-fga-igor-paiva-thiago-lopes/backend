@@ -12,6 +12,6 @@ class Config(object):
 
 class TestConfig(object):
     TESTING = True
-    SECRET_KEY = "chave_secreta"
+    JWT_SECRET_KEY = "chave_secreta"
     SQLALCHEMY_DATABASE_URI = "sqlite://"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
