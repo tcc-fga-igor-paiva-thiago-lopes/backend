@@ -7,7 +7,7 @@ from flask_jwt_extended import (
 )
 from sqlalchemy.exc import IntegrityError
 from flask import request, Blueprint
-
+from marshmallow import ValidationError
 from src.app import db, jwt
 from src.models.truck_driver import TruckDriver
 from src.controllers.common.group_api import GroupAPI
