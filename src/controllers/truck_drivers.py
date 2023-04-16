@@ -76,6 +76,12 @@ def login():
     )
 
 
+@controller.route("/who-am-i", methods=["GET"])
+@jwt_required()
+def whoAmI():
+    return {"id": current_user.id, "email": current_user.email}, requests.codes.ok
+
+
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
