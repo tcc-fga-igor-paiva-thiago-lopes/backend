@@ -18,7 +18,7 @@ def test_login_success(app, client):
     response = client.post("/truck-drivers/login", json=params)
 
     assert response.status_code == requests.codes.ok
-    print(decode_token(response.json["token"]))
+
     assert decode_token(response.json["token"])["sub"] == 1
 
 
