@@ -74,9 +74,7 @@ packaging==23.0
 psycopg2-binary==2.9.6
     # via -r requirements.in
 pyjwt==2.6.0
-    # via
-    #   -r requirements.in
-    #   flask-jwt-extended
+    # via flask-jwt-extended
 pytz==2023.3
     # via flask-restful
 requests==2.28.2
