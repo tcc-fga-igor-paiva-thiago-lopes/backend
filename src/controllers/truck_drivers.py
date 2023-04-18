@@ -76,6 +76,12 @@ def login():
     )
 
 
+@controller.route("/authenticated", methods=["GET"])
+@jwt_required()
+def isAuthenticated():
+    return {"id": current_user.id}, requests.codes.ok
+
+
 @controller.route("/who-am-i", methods=["GET"])
 @jwt_required()
 def whoAmI():
@@ -85,4 +91,4 @@ def whoAmI():
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
-    return db.first_or_404(TruckDriver.query.filter_by(id=identity))
+    return db.get_or_404(TruckDriver, identity)
