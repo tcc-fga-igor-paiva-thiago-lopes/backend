@@ -36,6 +36,7 @@ def create_app(is_testing=False):
     @app.errorhandler(Exception)
     def handle_exception(e):
         """Return JSON instead of HTML for HTTP errors."""
+        app.log_exception(e)
         if isinstance(e, HTTPException):
             response = e.get_response()
             response.data = json.dumps({"message": e.description})
