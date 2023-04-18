@@ -94,6 +94,36 @@ def test_login_fail_missing_email(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
+def test_user_authentication(client):
+    TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    params = {"email": "jao@mail.com", "password": "password"}
+
+    response = client.post("/truck-drivers/login", json=params)
+
+    token = response.json["token"]
+
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = client.get("/truck-drivers/authenticated", headers=headers)
+
+    assert response.status_code == requests.codes.ok
+    assert response.json["id"] == 1
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_user_authentication_fail(client):
+    response = client.get("/truck-drivers/authenticated")
+
+    assert response.status_code == requests.codes.unauthorized
+
+
+@pytest.mark.usefixtures("app_ctx")
 def test_creation_with_duplicated_email(client):
     TruckDriver.create(
         name="João",
