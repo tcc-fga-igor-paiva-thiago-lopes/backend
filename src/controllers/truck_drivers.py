@@ -78,13 +78,13 @@ def login():
 
 @controller.route("/authenticated", methods=["GET"])
 @jwt_required()
-def isAuthenticated():
+def is_authenticated():
     return {"id": current_user.id}, requests.codes.ok
 
 
 @controller.route("/who-am-i", methods=["GET"])
 @jwt_required()
-def whoAmI():
+def who_am_i():
     return {"id": current_user.id, "email": current_user.email}, requests.codes.ok
 
 
