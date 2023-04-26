@@ -135,8 +135,8 @@ def test_creation_with_duplicated_email(client):
     params = {
         "name": "Carlos",
         "email": "jao@mail.com",
-        "password": "123",
-        "password_confirmation": "123",
+        "password": "12345678",
+        "password_confirmation": "12345678",
     }
 
     response = client.post("/truck-drivers/", json=params)
