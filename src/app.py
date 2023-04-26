@@ -4,6 +4,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_jwt_extended import JWTManager
 from werkzeug.exceptions import HTTPException
 
 from src.controllers.common.utils import simple_error_response
@@ -11,6 +12,7 @@ from src.controllers.common.utils import simple_error_response
 db = SQLAlchemy()
 migrate = Migrate()
 ma = Marshmallow()
+jwt = JWTManager()
 
 
 def create_app(is_testing=False):
@@ -29,10 +31,12 @@ def create_app(is_testing=False):
     db.init_app(app)
     migrate.init_app(app, db)
     ma.init_app(app)
+    jwt.init_app(app)
 
     @app.errorhandler(Exception)
     def handle_exception(e):
         """Return JSON instead of HTML for HTTP errors."""
+        app.log_exception(e)
         if isinstance(e, HTTPException):
             response = e.get_response()
             response.data = json.dumps({"message": e.description})
