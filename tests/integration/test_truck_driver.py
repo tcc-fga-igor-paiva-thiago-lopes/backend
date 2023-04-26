@@ -139,8 +139,7 @@ def test_creation_with_duplicated_email(client):
         "password_confirmation": "123",
     }
 
-    # TODO: Don't know why is redirecting, we must verify this
-    response = client.post("/truck-drivers", json=params, follow_redirects=True)
+    response = client.post("/truck-drivers/", json=params)
 
     assert response.status_code == requests.codes.unprocessable_entity
     assert response.json["message"] == "Email já cadastrado"
