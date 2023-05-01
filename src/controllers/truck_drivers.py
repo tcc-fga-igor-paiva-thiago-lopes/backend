@@ -6,7 +6,7 @@ from flask_jwt_extended import (
     current_user,
 )
 from sqlalchemy.exc import IntegrityError
-from flask import request, Blueprint
+from flask import request, make_response, Blueprint
 from marshmallow import ValidationError
 from src.app import db, jwt
 from src.models.truck_driver import TruckDriver
@@ -17,6 +17,7 @@ from src.controllers.common.utils import (
     validation_error_response,
 )
 from src.schemas.truck_driver_schema import TruckDriverSchema
+from src.controllers.common.utils import permitted_parameters
 
 PERMITTED_PARAMS = ["name", "email", "password", "password_confirmation"]
 
@@ -39,19 +40,27 @@ def handle_validation_error(error):
     return validation_error_response(error, "Falha ao validar usuário")
 
 
-resource_kwargs = {
-    "model": TruckDriver,
-    "permitted_params": PERMITTED_PARAMS,
-    "model_schema": TruckDriverSchema,
-}
-
-api.add_resource(
-    GroupAPI,
-    "/",
-    endpoint="truck_drivers",
-    resource_class_kwargs=resource_kwargs,
-    methods=["POST"],
+@controller.route("/", methods=["POST"])
+@required_fields(
+    [
+        ("name", "nome"),
+        ("email", "e-mail"),
+        ("password", "senha"),
+        ("password_confirmation", "confirmação de senha"),
+    ]
 )
+def create():
+    request_data = request.get_json(force=True)
+
+    truck_driver = TruckDriverSchema().load(
+        permitted_parameters(request_data, PERMITTED_PARAMS)
+    )
+
+    truck_driver.save()
+
+    print(TruckDriverSchema().dump(truck_driver))
+
+    return make_response(TruckDriverSchema().dump(truck_driver), requests.codes.created)
 
 
 @controller.route("/login", methods=["POST"])
@@ -67,9 +76,12 @@ def login():
     if truck_driver.verify_password(request.json.get("password")):
         truck_driver.login()
 
-        return {
-            "token": create_access_token(identity=truck_driver.id),
-        }, requests.codes.ok
+        return make_response(
+            {
+                "token": create_access_token(identity=truck_driver.id),
+            },
+            requests.codes.ok,
+        )
 
     return simple_error_response(
         "Usuário ou senha incorretos", requests.codes.unauthorized
@@ -79,13 +91,15 @@ def login():
 @controller.route("/authenticated", methods=["GET"])
 @jwt_required()
 def is_authenticated():
-    return {"id": current_user.id}, requests.codes.ok
+    return make_response({"id": current_user.id}, requests.codes.ok)
 
 
 @controller.route("/who-am-i", methods=["GET"])
 @jwt_required()
 def who_am_i():
-    return {"id": current_user.id, "email": current_user.email}, requests.codes.ok
+    return make_response(
+        {"id": current_user.id, "email": current_user.email}, requests.codes.ok
+    )
 
 
 @jwt.user_lookup_loader
