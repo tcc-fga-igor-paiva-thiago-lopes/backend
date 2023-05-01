@@ -17,24 +17,11 @@ from src.controllers.common.utils import (
 )
 from src.schemas.category_schema import CategorySchema
 
-PERMITTED_PARAMS = ["name", "email", "password", "password_confirmation"]
+PERMITTED_PARAMS = ["name", "color"]
 
 controller = Blueprint("categories_controller", __name__, url_prefix="/categories")
 
 api = Api(controller)
-
-
-@controller.errorhandler(IntegrityError)
-def handle_integrity_error(_):
-    return simple_error_response(
-        "Email já cadastrado", requests.codes.unprocessable_entity
-    )
-
-
-@controller.errorhandler(ValidationError)
-def handle_validation_error(error):
-    return validation_error_response(error, "Falha ao validar usuário")
-
 
 resource_kwargs = {
     "model": Category,
@@ -47,5 +34,5 @@ api.add_resource(
     "/",
     endpoint="categories",
     resource_class_kwargs=resource_kwargs,
-    methods=["POST"],
+    methods=["POST", "GET"],
 )
