@@ -3,8 +3,8 @@ from sqlalchemy import LargeBinary
 from .application_model import ApplicationModel
 
 
-class TruckDriver(ApplicationModel):
-    __tablename__ = "TRUCK_DRIVER"
+class Category(ApplicationModel):
+    __tablename__ = "CATEGORY"
 
     FRIENDLY_NAME_SINGULAR = "Categoria"
     FRIENDLY_NAME_PLURAL = "Categorias"
