@@ -44,6 +44,27 @@ class GroupAPI(Resource):
 
         return make_response(self.item_schema.dump(item), requests.codes.created)
 
+    @jwt_required()
+    def delete(self):
+        id = request.args.get("id")
+        if id is None or id == "":
+            return make_response({"message": "ID não informado."}, requests.codes.bad)
+
+        item = db.get_or_404(
+            self.model,
+            request.args.get("id"),
+            description=f"{self.model.FRIENDLY_NAME_SINGULAR} não encontrado(a)",
+        )
+
+        item.destroy()
+
+        return make_response(
+            {
+                "message": f"{self.model.FRIENDLY_NAME_SINGULAR} deletado(a) com sucesso."
+            },
+            requests.codes.ok,
+        )
+
     @jwt.user_lookup_loader
     def user_lookup_callback(_jwt_header, jwt_data):
         identity = jwt_data["sub"]

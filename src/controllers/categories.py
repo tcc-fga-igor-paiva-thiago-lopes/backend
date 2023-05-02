@@ -21,5 +21,5 @@ api.add_resource(
     "/",
     endpoint="categories",
     resource_class_kwargs=resource_kwargs,
-    methods=["POST", "GET"],
+    methods=["POST", "GET", "DELETE"],
 )
