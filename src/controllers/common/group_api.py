@@ -19,6 +19,16 @@ class GroupAPI(Resource):
 
     @jwt_required()
     def get(self):
+        id = request.args.get("id")
+        if id is not None and id != "":
+            item = db.get_or_404(
+                self.model,
+                request.args.get("id"),
+                description=f"{self.model.FRIENDLY_NAME_SINGULAR} não encontrado(a).",
+            )
+
+            return make_response(self.item_schema.dump(item), requests.codes.ok)
+
         items = db.session.execute(db.select(self.model)).scalars()
 
         return make_response(self.group_schema.dump(items), requests.codes.ok)
