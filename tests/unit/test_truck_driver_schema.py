@@ -72,8 +72,8 @@ def test_truck_drivers_load():
         {
             "name": "João",
             "email": "jao@mail.com",
-            "password": "123",
-            "password_confirmation": "123",
+            "password": "12345678",
+            "password_confirmation": "12345678",
         },
         {
             "name": "John",
