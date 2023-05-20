@@ -68,6 +68,7 @@ def login():
         truck_driver.login()
 
         return {
+            "name": truck_driver.name,
             "token": create_access_token(identity=truck_driver.id),
         }, requests.codes.ok
 
