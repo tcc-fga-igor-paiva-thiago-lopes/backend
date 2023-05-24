@@ -7,6 +7,16 @@ def simple_error_response(msg, status, key="message"):
     return make_response({key: msg}, status)
 
 
+def fields_errors_response(
+    errors,
+    msg,
+    status,
+    msg_key="message",
+    errors_key="errors",
+):
+    return make_response({msg_key: msg, errors_key: errors}, status)
+
+
 def validation_error_response(
     validation_error,
     msg,

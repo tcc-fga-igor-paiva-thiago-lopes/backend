@@ -20,6 +20,7 @@ def test_login_success(app, client):
     assert response.status_code == requests.codes.ok
 
     assert decode_token(response.json["token"])["sub"] == 1
+    assert response.json["name"] == "João"
 
 
 @pytest.mark.usefixtures("app_ctx")

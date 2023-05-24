@@ -14,6 +14,7 @@ from src.controllers.common.group_api import GroupAPI
 from src.controllers.common.utils import (
     required_fields,
     simple_error_response,
+    fields_errors_response,
     validation_error_response,
 )
 from src.schemas.truck_driver_schema import TruckDriverSchema
@@ -29,8 +30,10 @@ api = Api(controller)
 
 @controller.errorhandler(IntegrityError)
 def handle_integrity_error(_):
-    return simple_error_response(
-        "Email já cadastrado", requests.codes.unprocessable_entity
+    return fields_errors_response(
+        {"email": ["Email já cadastrado"]},
+        "Email já cadastrado",
+        requests.codes.unprocessable_entity,
     )
 
 
@@ -68,6 +71,7 @@ def login():
         truck_driver.login()
 
         return {
+            "name": truck_driver.name,
             "token": create_access_token(identity=truck_driver.id),
         }, requests.codes.ok
 
