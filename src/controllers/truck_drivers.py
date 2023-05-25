@@ -1,23 +1,24 @@
 import requests
 from flask_restful import Api
+from sqlalchemy.exc import IntegrityError
+from flask import request, Blueprint
+from marshmallow import ValidationError
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
     current_user,
 )
-from sqlalchemy.exc import IntegrityError
-from flask import request, Blueprint
-from marshmallow import ValidationError
+
 from src.app import db, jwt
 from src.models.truck_driver import TruckDriver
 from src.controllers.common.group_api import GroupAPI
+from src.schemas.truck_driver_schema import TruckDriverSchema
 from src.controllers.common.utils import (
     required_fields,
     simple_error_response,
     fields_errors_response,
     validation_error_response,
 )
-from src.schemas.truck_driver_schema import TruckDriverSchema
 
 PERMITTED_PARAMS = ["name", "email", "password", "password_confirmation"]
 
@@ -48,8 +49,13 @@ resource_kwargs = {
     "model_schema": TruckDriverSchema,
 }
 
+
+class TruckDriverGroupAPI(GroupAPI):
+    decorators = []
+
+
 api.add_resource(
-    GroupAPI,
+    TruckDriverGroupAPI,
     "/",
     endpoint="truck_drivers",
     resource_class_kwargs=resource_kwargs,

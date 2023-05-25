@@ -1,12 +1,15 @@
 import requests
 from flask_restful import Resource
 from flask import request, make_response
+from flask_jwt_extended import jwt_required
+
 
 from src.controllers.common.utils import permitted_parameters
 
 
 class ItemAPI(Resource):
     init_every_request = False
+    decorators = [jwt_required()]
 
     def __init__(self, model, permitted_params, model_schema):
         self.model = model
