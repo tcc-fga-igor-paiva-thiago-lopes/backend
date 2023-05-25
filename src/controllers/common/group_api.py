@@ -18,19 +18,19 @@ class GroupAPI(Resource):
         model,
         permitted_params,
         model_schema,
-        user_association=None,
+        list_query=None,
         user_association_fk=None,
     ):
         self.model = model
         self.permitted_params = permitted_params
         self.item_schema = model_schema()
         self.group_schema = model_schema(many=True)
-        self.user_association = user_association
+        self.list_query = list_query
         self.user_association_fk = user_association_fk
 
     def _get_records(self):
-        if self.user_association is not None:
-            return getattr(current_user, self.user_association)
+        if self.list_query is not None:
+            return self.list_query(current_user)
 
         return db.session.execute(db.select(self.model)).scalars()
 

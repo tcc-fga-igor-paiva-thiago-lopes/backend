@@ -51,7 +51,7 @@ resource_kwargs = {
 
 group_resource_kwargs = {
     **resource_kwargs,
-    "user_association": "freights",
+    "list_query": lambda user: user.freights,
     "user_association_fk": "truck_driver_id",
 }
 
