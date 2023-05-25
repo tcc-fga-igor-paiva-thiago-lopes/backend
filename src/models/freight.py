@@ -38,6 +38,7 @@ class Freight(ApplicationModel):
     truck_driver_id = db.Column(
         db.BigInteger,
         db.ForeignKey("TRUCK_DRIVER.id", ondelete="CASCADE"),
+        index=True,
         nullable=False,
     )
 
