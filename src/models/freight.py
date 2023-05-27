@@ -11,7 +11,6 @@ class Freight(ApplicationModel):
     FRIENDLY_NAME_SINGULAR = "Frete"
     FRIENDLY_NAME_PLURAL = "Fretes"
 
-    name = db.Column(db.String(60), nullable=False)
     cargo = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(500), nullable=False)
     contractor = db.Column(db.String(60), nullable=False)
