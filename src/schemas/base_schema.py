@@ -5,6 +5,19 @@ from src.app import db
 
 fields.Field.default_error_messages["required"] = "campo obrigatório não informado"
 
+fields.Enum.default_error_messages[
+    "unknown"
+] = "Deve ser uma das seguintes opções: {choices}."
+
+fields.Number.default_error_messages = {
+    "invalid": "Não é um número válido",
+    "too_large": "Número muito grande",
+}
+
+fields.DateTime.default_error_messages = {
+    "invalid": "Não é uma data e hora válida",
+}
+
 
 class BaseSchema(SQLAlchemyAutoSchema):
     __abstract__ = True
