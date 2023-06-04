@@ -24,6 +24,14 @@ class FreightCargoEnum(str, enum.Enum):
     DANGEROUS_SOLID_BULK = "Perigosa Granel Sólido"
 
 
+class FreightStatusEnum(str, enum.Enum):
+    NOT_STARTED = ("Não iniciado",)
+    STARTED = ("Em progresso",)
+    WAITING_UNLOAD = ("Aguardando descarga",)
+    # WAITING_PAYMENT = 'Aguardando pagamento',
+    FINISHED = ("Finalizado",)
+
+
 class Freight(ApplicationModel):
     __tablename__ = "FREIGHT"
 
@@ -31,6 +39,7 @@ class Freight(ApplicationModel):
     FRIENDLY_NAME_PLURAL = "Fretes"
 
     cargo = db.Column(db.Enum(FreightCargoEnum), nullable=False)
+    status = db.Column(db.Enum(FreightStatusEnum), nullable=False)
     description = db.Column(db.String(500), nullable=False)
     contractor = db.Column(db.String(60), nullable=False)
     cargo_weight = db.Column(db.Numeric(8, 2), nullable=False)

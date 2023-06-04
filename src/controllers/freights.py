@@ -13,6 +13,7 @@ from src.controllers.common.utils import (
 PERMITTED_PARAMS = [
     "name",
     "cargo",
+    "status",
     "description",
     "contractor",
     "cargo_weight",

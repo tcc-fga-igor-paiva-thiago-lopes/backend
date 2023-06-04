@@ -1,7 +1,7 @@
 from marshmallow import fields
 
 from src.schemas.base_schema import BaseSchema
-from src.models.freight import Freight, FreightCargoEnum
+from src.models.freight import Freight, FreightCargoEnum, FreightStatusEnum
 
 
 class FreightSchema(BaseSchema):
@@ -9,6 +9,7 @@ class FreightSchema(BaseSchema):
         model = Freight
 
     cargo = fields.Enum(FreightCargoEnum, by_value=True)
+    status = fields.Enum(FreightStatusEnum, by_value=True)
 
 
 freight_schema = FreightSchema()
