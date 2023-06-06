@@ -42,7 +42,27 @@ freight_two_attrs = {
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_list(client):
+def test_freights_list_authorization(client):
+    response = client.get("/freights/")
+
+    assert response.status_code == requests.codes.unauthorized
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_creation_authorization(client):
+    response = client.post(
+        "/freights/",
+        json={
+            **freight_one_attrs,
+            "start_date": datetime.isoformat(freight_one_attrs["start_date"]),
+        },
+    )
+
+    assert response.status_code == requests.codes.unauthorized
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_update_authorization(client):
     truck_driver = TruckDriver.create(
         name="João",
         email="jao@mail.com",
@@ -50,12 +70,78 @@ def test_freights_list(client):
         password_confirmation="password",
     )
 
+    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver)
+
+    response = client.patch(
+        f"/freights/{freight.id}",
+        json={
+            "cargo": FreightCargoEnum.DANGEROUS_GENERAL,
+            "status": FreightStatusEnum.WAITING_UNLOAD,
+            "description": "changed?",
+        },
+    )
+
+    assert response.status_code == requests.codes.unauthorized
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_removal_authorization(client):
+    truck_driver = TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver)
+
+    response = client.delete(f"/freights/{freight.id}")
+
+    assert response.status_code == requests.codes.unauthorized
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_show_authorization(client):
+    truck_driver = TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    freight = Freight.create(**freight_two_attrs, truck_driver=truck_driver)
+
+    response = client.get(
+        f"/freights/{freight.id}",
+    )
+
+    assert response.status_code == requests.codes.unauthorized
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_list(client):
+    truck_driver_one = TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    truck_driver_two = TruckDriver.create(
+        name="Carlos",
+        email="carlos@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    Freight.create(**freight_one_attrs, truck_driver=truck_driver_two)
+
     freights = [
-        Freight.create(**freight_one_attrs, truck_driver=truck_driver),
-        Freight.create(**freight_two_attrs, truck_driver_id=truck_driver.id),
+        Freight.create(**freight_one_attrs, truck_driver=truck_driver_one),
+        Freight.create(**freight_two_attrs, truck_driver_id=truck_driver_one.id),
     ]
 
-    token = create_access_token(identity=truck_driver.id)
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.get("/freights/", headers={"Authorization": f"Bearer {token}"})
 
@@ -63,7 +149,7 @@ def test_freights_list(client):
 
     for idx, freight in enumerate(response.json):
         assert freight["id"] == freights[idx].id
-        assert freight["truck_driver_id"] == freights[idx].truck_driver.id
+        assert freight["truck_driver_id"] == truck_driver_one.id
 
 
 @pytest.mark.usefixtures("app_ctx")
