@@ -64,6 +64,7 @@ def test_truck_driver_dump():
     assert td_dict["last_sign_in_at"] is None
     assert td_dict["created_at"] == truck_driver.created_at.isoformat()
     assert td_dict["updated_at"] is None
+    assert td_dict.get("freights", None) is None
 
 
 @pytest.mark.usefixtures("app_ctx")
