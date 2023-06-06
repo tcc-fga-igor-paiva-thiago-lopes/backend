@@ -2,8 +2,6 @@ import enum
 
 from src.app import db
 
-# Must import, so the relationship is loaded properly
-from .truck_driver import TruckDriver
 from .application_model import ApplicationModel
 
 
@@ -69,4 +67,4 @@ class Freight(ApplicationModel):
         nullable=False,
     )
 
-    truck_driver = db.relationship(TruckDriver, back_populates="freights")
+    truck_driver = db.relationship("TruckDriver", back_populates="freights")

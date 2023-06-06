@@ -44,3 +44,6 @@ class ApplicationModel(db.Model):
         db.session.delete(self)
 
         return db.session.commit()
+
+    def reload(self):
+        db.session.refresh(self)

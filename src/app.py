@@ -48,12 +48,12 @@ def create_app(is_testing=False):
             "Erro interno do servidor", requests.codes.internal_server_error
         )
 
-    from src.controllers.freights import controller as freights_controller
-
-    app.register_blueprint(freights_controller)
-
     from src.controllers.truck_drivers import controller as truck_drivers_controller
 
     app.register_blueprint(truck_drivers_controller)
+
+    from src.controllers.freights import controller as freights_controller
+
+    app.register_blueprint(freights_controller)
 
     return app
