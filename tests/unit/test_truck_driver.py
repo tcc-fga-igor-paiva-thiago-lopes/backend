@@ -1,9 +1,11 @@
 import pytz
 import pytest
 import sqlalchemy
+from dateutil import parser
 from datetime import datetime, timedelta
 
 from src.app import db
+from src.models.freight import Freight
 from src.models.truck_driver import TruckDriver
 
 
@@ -126,3 +128,31 @@ def test_truck_driver_removal():
         db.session.execute(
             db.select(TruckDriver).filter_by(email=truck_driver.email)
         ).scalar_one()
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_truck_driver_freights_association():
+    truck_driver = TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="12345678",
+        password_confirmation="12345678",
+    )
+
+    freight = Freight.create(
+        cargo="Neogranel",
+        status="Em progresso",
+        description="there and back again",
+        contractor="Jefferson Caminhões",
+        cargo_weight=18.5,
+        agreed_payment=8000,
+        distance=2677.33,
+        start_date=parser.parse("2023-05-24T16:30:00.000Z"),
+        origin_city="São Paulo",
+        origin_state="SP",
+        destination_city="Brasília",
+        destination_state="DF",
+        truck_driver=truck_driver,
+    )
+
+    assert freight in truck_driver.freights

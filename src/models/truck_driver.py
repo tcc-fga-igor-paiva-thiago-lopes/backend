@@ -1,7 +1,10 @@
 import bcrypt
 from src.app import db
 from sqlalchemy.sql import func
+
 from .application_model import ApplicationModel
+
+from .freight import Freight
 
 
 class TruckDriver(ApplicationModel):
@@ -14,6 +17,8 @@ class TruckDriver(ApplicationModel):
     email = db.Column(db.String(256), nullable=False, unique=True)
     password_digest = db.Column(db.String(512))
     last_sign_in_at = db.Column(db.DateTime(timezone=True))
+
+    freights = db.relationship(Freight, back_populates="truck_driver")
 
     def __init__(self, **kwargs):
         password = kwargs.pop("password", None)
