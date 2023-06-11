@@ -11,6 +11,7 @@ from src.models.freight import Freight, FreightCargoEnum, FreightStatusEnum
 
 
 freight_one_attrs = {
+    "identifier": "a9df5d98-23c1-4a2e-90a2-189456eedcd3",
     "cargo": FreightCargoEnum.NEW_BULK,
     "status": FreightStatusEnum.STARTED,
     "description": "there and back again",
@@ -26,6 +27,7 @@ freight_one_attrs = {
 }
 
 freight_two_attrs = {
+    "identifier": "a9df5d98-23c1-4a2e-90a2-189456eedcd4",
     "cargo": FreightCargoEnum.GENERAL,
     "status": FreightStatusEnum.NOT_STARTED,
     "description": "there and back again 2",
@@ -134,7 +136,10 @@ def test_freights_list(client):
         password_confirmation="password",
     )
 
-    Freight.create(**freight_one_attrs, truck_driver=truck_driver_two)
+    other_user_freight = freight_one_attrs.copy()
+    other_user_freight["identifier"] = "0d6868a1-7e95-4b3b-bf10-8e4b1e23c85f"
+
+    Freight.create(**other_user_freight, truck_driver=truck_driver_two)
 
     freights = [
         Freight.create(**freight_one_attrs, truck_driver=truck_driver_one),
@@ -200,6 +205,7 @@ def test_freights_creation_missing_required_fields(client):
     assert response.status_code == requests.codes.bad_request
     assert response.json == {
         "errors": {
+            "identifier": ["campo obrigatório não informado"],
             "agreed_payment": ["campo obrigatório não informado"],
             "cargo_weight": ["campo obrigatório não informado"],
             "contractor": ["campo obrigatório não informado"],
@@ -228,6 +234,7 @@ def test_freights_creation_with_invalid_fields(client):
     response = client.post(
         "/freights/",
         json={
+            "identifier": "hs6216shd-23c1-4a2e-90a2-189456eedcd",
             "cargo": "Xablau",
             "status": "Unknown status",
             "description": 123,

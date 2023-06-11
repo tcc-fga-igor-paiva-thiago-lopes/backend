@@ -2,7 +2,7 @@ import bcrypt
 from src.app import db
 from sqlalchemy.sql import func
 
-from .application_model import ApplicationModel
+from .common.application_model import ApplicationModel
 
 from .freight import Freight
 

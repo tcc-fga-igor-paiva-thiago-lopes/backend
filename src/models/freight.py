@@ -2,7 +2,7 @@ import enum
 
 from src.app import db
 
-from .application_model import ApplicationModel
+from .common.syncable_model import SyncableModel
 
 
 class FreightCargoEnum(str, enum.Enum):
@@ -23,14 +23,14 @@ class FreightCargoEnum(str, enum.Enum):
 
 
 class FreightStatusEnum(str, enum.Enum):
-    NOT_STARTED = ("Não iniciado",)
-    STARTED = ("Em progresso",)
-    WAITING_UNLOAD = ("Aguardando descarga",)
-    # WAITING_PAYMENT = 'Aguardando pagamento',
-    FINISHED = ("Finalizado",)
+    NOT_STARTED = "Não iniciado"
+    STARTED = "Em progresso"
+    WAITING_UNLOAD = "Aguardando descarga"
+    # WAITING_PAYMENT = "Aguardando pagamento"
+    FINISHED = "Finalizado"
 
 
-class Freight(ApplicationModel):
+class Freight(SyncableModel):
     __tablename__ = "FREIGHT"
 
     FRIENDLY_NAME_SINGULAR = "Frete"

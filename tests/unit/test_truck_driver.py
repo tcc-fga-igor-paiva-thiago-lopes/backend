@@ -140,6 +140,7 @@ def test_truck_driver_freights_association():
     )
 
     freight = Freight.create(
+        identifier="a9df5d98-23c1-4a2e-90a2-189456eedcd3",
         cargo="Neogranel",
         status="Em progresso",
         description="there and back again",

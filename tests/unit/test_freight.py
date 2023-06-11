@@ -8,6 +8,7 @@ from src.models.truck_driver import TruckDriver
 from src.models.freight import Freight, FreightCargoEnum, FreightStatusEnum
 
 freight_attrs = {
+    "identifier": "a9df5d98-23c1-4a2e-90a2-189456eedcd3",
     "cargo": FreightCargoEnum.NEW_BULK,
     "status": FreightStatusEnum.STARTED,
     "description": "there and back again",
