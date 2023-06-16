@@ -76,11 +76,11 @@ class GroupAPI(Resource):
         import_data = self._process_import_fields(request.get_json(force=True))
 
         # Using group_schema to validate fields
-        self.group_schema.load(import_data)
+        self.group_schema.load(import_data, partial=True)
 
         if len(import_data) == 0:
             return simple_error_response(
-                "Nenhum registro a importar", requests.codes.bad_request
+                "Nenhum registro a sincronizar", requests.codes.bad_request
             )
 
         ret = self.model.upsert(data=import_data, unique_by=["identifier"])

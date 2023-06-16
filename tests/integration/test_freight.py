@@ -24,6 +24,8 @@ freight_one_attrs = {
     "origin_state": "SP",
     "destination_city": "Brasília",
     "destination_state": "DF",
+    "due_date": None,
+    "finished_date": None,
 }
 
 freight_two_attrs = {
@@ -40,6 +42,26 @@ freight_two_attrs = {
     "origin_state": "DF",
     "destination_city": "São Paulo",
     "destination_state": "SP",
+    "due_date": None,
+    "finished_date": None,
+}
+
+freight_three_import_attrs = {
+    "identifier": "1d605f22-bbe5-47d9-a437-86e0d08c6e26",
+    "cargo": FreightCargoEnum.DANGEROUS_REFRIGERATED,
+    "status": FreightStatusEnum.WAITING_UNLOAD,
+    "description": "there and back again 3",
+    "contractor": "Chico Fretes",
+    "cargo_weight": 1.765,
+    "agreed_payment": 2301.93,
+    "distance": 3050.11,
+    "start_date": "2023-05-24T16:30:00.000Z",
+    "origin_city": "Palmas",
+    "origin_state": "TO",
+    "destination_city": "São José dos Campos",
+    "destination_state": "SP",
+    "due_date": None,
+    "finished_date": None,
 }
 
 
@@ -115,6 +137,16 @@ def test_freights_show_authorization(client):
 
     response = client.get(
         f"/freights/{freight.id}",
+    )
+
+    assert response.status_code == requests.codes.unauthorized
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_sync_authorization(client):
+    response = client.patch(
+        "/freights/",
+        json=[freight_one_attrs, freight_two_attrs],
     )
 
     assert response.status_code == requests.codes.unauthorized
@@ -434,3 +466,252 @@ def test_freights_show_not_found(client):
     )
 
     assert response.status_code == requests.codes.not_found
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_sync_empty_payload(client):
+    truck_driver = TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    token = create_access_token(identity=truck_driver.id)
+
+    response = client.patch(
+        "/freights/",
+        json=[],
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == requests.codes.bad_request
+    assert response.json["message"] == "Nenhum registro a sincronizar"
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_sync_with_invalid_fields(client):
+    truck_driver = TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    token = create_access_token(identity=truck_driver.id)
+
+    response = client.patch(
+        "/freights/",
+        json=[
+            {
+                "identifier": "hs6216shd-23c1-4a2e-90a2-189456eedcd",
+                "cargo": "Xablau",
+                "status": "Unknown status",
+                "description": 123,
+                "contractor": 456,
+                "cargo_weight": "",
+                "agreed_payment": "8000",
+                "distance": "",
+                "start_date": "2023-05-",
+                "due_date": "2023-05-",
+                "finished_date": "2023-05-",
+                "origin_city": 567,
+                "origin_state": "BRA",
+                "origin_country": 567,
+                "origin_latitude": "",
+                "origin_longitude": "",
+                "destination_city": 789,
+                "destination_state": "BRA",
+                "destination_country": 789,
+                "destination_latitude": "",
+                "destination_longitude": "",
+            },
+            {
+                "identifier": "3d9f724f-aa0d-4cf7-8b75-97653a5ce5b7",
+                "cargo": "Unknown",
+                "status": "Status desconhecido ",
+                "description": 123,
+                "contractor": 456,
+                "cargo_weight": "",
+                "agreed_payment": "8000",
+                "distance": "",
+                "start_date": "2023-05-",
+                "due_date": "2023-05-",
+                "finished_date": "2023-05-",
+                "origin_city": 567,
+                "origin_state": "BRA",
+                "origin_country": 567,
+                "origin_latitude": "",
+                "origin_longitude": "",
+                "destination_city": 789,
+                "destination_state": "BRA",
+                "destination_country": 789,
+                "destination_latitude": "",
+                "destination_longitude": "",
+            },
+        ],
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == requests.codes.bad_request
+    assert response.json == {
+        "message": "Falha ao validar frete",
+        "errors": {
+            "0": {
+                "cargo": [
+                    "Deve ser uma das seguintes opções: Geral, Conteinerizada, Frigorificada, Granel Líquido, "
+                    + "Granel Pressurizada, Granel Sólido, Neogranel, Perigosa Geral, Perigosa Conteinerizada, "
+                    + "Perigosa Frigorificada, Perigosa Granel Líquido, Perigosa Granel Pressurizada, "
+                    + "Perigosa Granel Sólido."
+                ],
+                "cargo_weight": ["Não é um número válido"],
+                "contractor": ["Não é uma string (texto) válido"],
+                "description": ["Não é uma string (texto) válido"],
+                "destination_city": ["Não é uma string (texto) válido"],
+                "destination_country": ["Não é uma string (texto) válido"],
+                "destination_latitude": ["Não é um número válido"],
+                "destination_longitude": ["Não é um número válido"],
+                "destination_state": ["Maior que o tamanho máximo de 2 caracteres"],
+                "distance": ["Não é um número válido"],
+                "due_date": ["Não é uma data e hora válida"],
+                "finished_date": ["Não é uma data e hora válida"],
+                "origin_city": ["Não é uma string (texto) válido"],
+                "origin_country": ["Não é uma string (texto) válido"],
+                "origin_latitude": ["Não é um número válido"],
+                "origin_longitude": ["Não é um número válido"],
+                "origin_state": ["Maior que o tamanho máximo de 2 caracteres"],
+                "start_date": ["Não é uma data e hora válida"],
+                "status": [
+                    "Deve ser uma das seguintes opções: Não iniciado, Em progresso, Aguardando descarga, Finalizado."
+                ],
+            },
+            "1": {
+                "cargo": [
+                    "Deve ser uma das seguintes opções: Geral, Conteinerizada, Frigorificada, Granel Líquido, "
+                    + "Granel Pressurizada, Granel Sólido, Neogranel, Perigosa Geral, Perigosa Conteinerizada, "
+                    + "Perigosa Frigorificada, Perigosa Granel Líquido, Perigosa Granel Pressurizada, "
+                    + "Perigosa Granel Sólido."
+                ],
+                "cargo_weight": ["Não é um número válido"],
+                "contractor": ["Não é uma string (texto) válido"],
+                "description": ["Não é uma string (texto) válido"],
+                "destination_city": ["Não é uma string (texto) válido"],
+                "destination_country": ["Não é uma string (texto) válido"],
+                "destination_latitude": ["Não é um número válido"],
+                "destination_longitude": ["Não é um número válido"],
+                "destination_state": ["Maior que o tamanho máximo de 2 caracteres"],
+                "distance": ["Não é um número válido"],
+                "due_date": ["Não é uma data e hora válida"],
+                "finished_date": ["Não é uma data e hora válida"],
+                "origin_city": ["Não é uma string (texto) válido"],
+                "origin_country": ["Não é uma string (texto) válido"],
+                "origin_latitude": ["Não é um número válido"],
+                "origin_longitude": ["Não é um número válido"],
+                "origin_state": ["Maior que o tamanho máximo de 2 caracteres"],
+                "start_date": ["Não é uma data e hora válida"],
+                "status": [
+                    "Deve ser uma das seguintes opções: Não iniciado, Em progresso, Aguardando descarga, Finalizado."
+                ],
+            },
+        },
+    }
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_sync_same_fields(client):
+    truck_driver = TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    token = create_access_token(identity=truck_driver.id)
+
+    import_data = [freight_one_attrs.copy(), freight_two_attrs.copy()]
+
+    for key in ["due_date", "finished_date"]:
+        del import_data[1][key]
+
+    for attrs in import_data:
+        attrs["contractor"] = "Chico Fretes"
+        attrs["start_date"] = attrs["start_date"].isoformat()
+
+    assert len(truck_driver.freights) == 0
+
+    response = client.patch(
+        "/freights/",
+        json=import_data,
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == requests.codes.bad_request
+    assert (
+        response.json["message"]
+        == "Ao sincronizar registros, todos devem possuir os mesmos campos"
+    )
+
+    assert len(truck_driver.freights) == 0
+
+
+# TODO: Test database is a SQLite but in production is PostgreSQL, we must handle this
+# TODO: SQLalchemy SQLite Datetime only accepts datetime object
+# and Marshmallow only accepts string in Datetime. We must to something to fix this
+# @pytest.mark.usefixtures("app_ctx")
+# def test_freights_sync_success(client):
+#     truck_driver = TruckDriver.create(
+#         name="João",
+#         email="jao@mail.com",
+#         password="password",
+#         password_confirmation="password",
+#     )
+
+#     freight_one = Freight.create(**freight_one_attrs, truck_driver=truck_driver)
+#     freight_two = Freight.create(**freight_two_attrs, truck_driver=truck_driver)
+
+#     token = create_access_token(identity=truck_driver.id)
+
+#     import_data = [
+#         {
+#             **freight_one_attrs,
+#             "start_date": freight_one_attrs["start_date"].isoformat(),
+#             "status": FreightStatusEnum.NOT_STARTED,
+#         },
+#         {
+#             **freight_two_attrs,
+#             "start_date": freight_two_attrs["start_date"].isoformat(),
+#             "agreed_payment": 6509.15,
+#         },
+#         freight_three_import_attrs,
+#     ]
+
+#     print(
+#         "\n\n",
+#         import_data,
+#         "\n\n",
+#     )
+
+#     assert len(truck_driver.freights) == 2
+
+#     response = client.patch(
+#         "/freights/",
+#         json=import_data,
+#         headers={"Authorization": f"Bearer {token}"},
+#     )
+
+#     assert response.json == [attrs["identifier"] for attrs in import_data]
+#     assert response.status_code == requests.codes.ok
+
+#     freight_one.reload()
+#     freight_two.reload()
+
+#     assert freight_one.status == FreightStatusEnum.NOT_STARTED
+#     assert freight_two.agreed_payment == 6509.15
+
+#     assert len(truck_driver.freights) == 3
+
+#     freight_three = db.session.execute(
+#         db.select(Freight).order_by(Freight.created_at.desc())
+#     ).scalars()[-1]
+
+#     assert freight_three.identifier == freight_three_import_attrs["identifier"]
