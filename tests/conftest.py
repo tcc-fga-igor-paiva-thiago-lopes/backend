@@ -43,7 +43,7 @@ def app_ctx(app):
 
 
 @pytest.fixture()
-def truck_driver_joao():
+def truck_driver_one():
     return TruckDriver.create(
         name="João",
         email="jao@mail.com",

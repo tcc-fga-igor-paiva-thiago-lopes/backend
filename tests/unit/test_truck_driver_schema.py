@@ -7,18 +7,11 @@ from src.schemas.truck_driver_schema import truck_driver_schema, truck_drivers_s
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_truck_driver_load_with_id():
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    ret = truck_driver_schema.load(truck_driver.id)
+def test_truck_driver_load_with_id(truck_driver_one):
+    ret = truck_driver_schema.load(truck_driver_one.id)
 
     assert isinstance(ret, TruckDriver)
-    assert ret.id == truck_driver.id
+    assert ret.id == truck_driver_one.id
 
 
 @pytest.mark.usefixtures("app_ctx")
@@ -49,20 +42,13 @@ def test_truck_driver_load():
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_truck_driver_dump():
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
+def test_truck_driver_dump(truck_driver_one):
+    td_dict = truck_driver_schema.dump(truck_driver_one)
 
-    td_dict = truck_driver_schema.dump(truck_driver)
-
-    assert td_dict["id"] == truck_driver.id
-    assert td_dict["email"] == truck_driver.email
+    assert td_dict["id"] == truck_driver_one.id
+    assert td_dict["email"] == truck_driver_one.email
     assert td_dict["last_sign_in_at"] is None
-    assert td_dict["created_at"] == truck_driver.created_at.isoformat()
+    assert td_dict["created_at"] == truck_driver_one.created_at.isoformat()
     assert td_dict["updated_at"] is None
     assert td_dict.get("freights", None) is None
 
@@ -100,13 +86,7 @@ def test_truck_drivers_load():
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_truck_drivers_dump():
-    td_one = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
+def test_truck_drivers_dump(truck_driver_one):
     td_two = TruckDriver.create(
         name="John",
         email="john@mail.com",
@@ -119,7 +99,7 @@ def test_truck_drivers_dump():
     )
 
     expected_pairs = [
-        (td_one, truck_drivers_dicts[0]),
+        (truck_driver_one, truck_drivers_dicts[0]),
         (td_two, truck_drivers_dicts[1]),
     ]
 

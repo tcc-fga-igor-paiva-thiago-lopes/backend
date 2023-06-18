@@ -86,15 +86,8 @@ def test_freights_creation_authorization(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_update_authorization(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver)
+def test_freights_update_authorization(client, truck_driver_one):
+    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
 
     response = client.patch(
         f"/freights/{freight.id}",
@@ -109,15 +102,8 @@ def test_freights_update_authorization(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_removal_authorization(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver)
+def test_freights_removal_authorization(client, truck_driver_one):
+    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
 
     response = client.delete(f"/freights/{freight.id}")
 
@@ -125,15 +111,8 @@ def test_freights_removal_authorization(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_show_authorization(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    freight = Freight.create(**freight_two_attrs, truck_driver=truck_driver)
+def test_freights_show_authorization(client, truck_driver_one):
+    freight = Freight.create(**freight_two_attrs, truck_driver=truck_driver_one)
 
     response = client.get(
         f"/freights/{freight.id}",
@@ -160,14 +139,7 @@ def test_freights_delete_authorization(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_list(client):
-    truck_driver_one = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
+def test_freights_list(client, truck_driver_one):
     truck_driver_two = TruckDriver.create(
         name="Carlos",
         email="carlos@mail.com",
@@ -197,17 +169,10 @@ def test_freights_list(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_creation(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
+def test_freights_creation(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
-    token = create_access_token(identity=truck_driver.id)
-
-    assert len(truck_driver.freights) == 0
+    assert len(truck_driver_one.freights) == 0
 
     response = client.post(
         "/freights/",
@@ -218,22 +183,15 @@ def test_freights_creation(client):
         headers={"Authorization": f"Bearer {token}"},
     )
 
-    truck_driver.reload()
+    truck_driver_one.reload()
 
     assert response.status_code == requests.codes.created
-    assert len(truck_driver.freights) == 1
+    assert len(truck_driver_one.freights) == 1
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_creation_missing_required_fields(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    token = create_access_token(identity=truck_driver.id)
+def test_freights_creation_missing_required_fields(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.post(
         "/freights/",
@@ -260,15 +218,8 @@ def test_freights_creation_missing_required_fields(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_creation_with_invalid_fields(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    token = create_access_token(identity=truck_driver.id)
+def test_freights_creation_with_invalid_fields(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.post(
         "/freights/",
@@ -333,17 +284,10 @@ def test_freights_creation_with_invalid_fields(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_update(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
+def test_freights_update(client, truck_driver_one):
+    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
 
-    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver)
-
-    token = create_access_token(identity=truck_driver.id)
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.patch(
         f"/freights/{freight.id}",
@@ -365,15 +309,8 @@ def test_freights_update(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_update_not_found(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    token = create_access_token(identity=truck_driver.id)
+def test_freights_update_not_found(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.patch(
         "/freights/1289371892371823123",
@@ -389,17 +326,10 @@ def test_freights_update_not_found(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_removal(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
+def test_freights_removal(client, truck_driver_one):
+    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
 
-    freight = Freight.create(**freight_one_attrs, truck_driver=truck_driver)
-
-    token = create_access_token(identity=truck_driver.id)
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.delete(
         f"/freights/{freight.id}",
@@ -413,15 +343,8 @@ def test_freights_removal(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_removal_not_found(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    token = create_access_token(identity=truck_driver.id)
+def test_freights_removal_not_found(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.delete(
         "/freights/9817283123812312",
@@ -432,17 +355,10 @@ def test_freights_removal_not_found(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_show(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
+def test_freights_show(client, truck_driver_one):
+    freight = Freight.create(**freight_two_attrs, truck_driver=truck_driver_one)
 
-    freight = Freight.create(**freight_two_attrs, truck_driver=truck_driver)
-
-    token = create_access_token(identity=truck_driver.id)
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.get(
         f"/freights/{freight.id}",
@@ -457,15 +373,8 @@ def test_freights_show(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_show_not_found(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    token = create_access_token(identity=truck_driver.id)
+def test_freights_show_not_found(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.get(
         "/freights/12381273612837861",
@@ -476,15 +385,8 @@ def test_freights_show_not_found(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_sync_empty_payload(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    token = create_access_token(identity=truck_driver.id)
+def test_freights_sync_empty_payload(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.patch(
         "/freights/",
@@ -497,15 +399,8 @@ def test_freights_sync_empty_payload(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_sync_with_invalid_fields(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    token = create_access_token(identity=truck_driver.id)
+def test_freights_sync_with_invalid_fields(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.patch(
         "/freights/",
@@ -625,15 +520,8 @@ def test_freights_sync_with_invalid_fields(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_sync_same_fields(client):
-    truck_driver = TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    token = create_access_token(identity=truck_driver.id)
+def test_freights_sync_same_fields(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     import_data = [freight_one_attrs.copy(), freight_two_attrs.copy()]
 
@@ -644,7 +532,7 @@ def test_freights_sync_same_fields(client):
         attrs["contractor"] = "Chico Fretes"
         attrs["start_date"] = attrs["start_date"].isoformat()
 
-    assert len(truck_driver.freights) == 0
+    assert len(truck_driver_one.freights) == 0
 
     response = client.patch(
         "/freights/",
@@ -658,25 +546,18 @@ def test_freights_sync_same_fields(client):
         == "Ao sincronizar registros, todos devem possuir os mesmos campos"
     )
 
-    assert len(truck_driver.freights) == 0
+    assert len(truck_driver_one.freights) == 0
 
 
 # TODO: Test database is a SQLite but in production is PostgreSQL, we must handle this
 # TODO: SQLalchemy SQLite Datetime only accepts datetime object
 # and Marshmallow only accepts string in Datetime. We must to something to fix this
 # @pytest.mark.usefixtures("app_ctx")
-# def test_freights_sync_success(client):
-#     truck_driver = TruckDriver.create(
-#         name="João",
-#         email="jao@mail.com",
-#         password="password",
-#         password_confirmation="password",
-#     )
+# def test_freights_sync_success(client, truck_driver_one):
+#     freight_one = Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
+#     freight_two = Freight.create(**freight_two_attrs, truck_driver=truck_driver_one)
 
-#     freight_one = Freight.create(**freight_one_attrs, truck_driver=truck_driver)
-#     freight_two = Freight.create(**freight_two_attrs, truck_driver=truck_driver)
-
-#     token = create_access_token(identity=truck_driver.id)
+#     token = create_access_token(identity=truck_driver_one.id)
 
 #     import_data = [
 #         {
@@ -692,13 +573,7 @@ def test_freights_sync_same_fields(client):
 #         freight_three_import_attrs,
 #     ]
 
-#     print(
-#         "\n\n",
-#         import_data,
-#         "\n\n",
-#     )
-
-#     assert len(truck_driver.freights) == 2
+#     assert len(truck_driver_one.freights) == 2
 
 #     response = client.patch(
 #         "/freights/",
@@ -715,7 +590,7 @@ def test_freights_sync_same_fields(client):
 #     assert freight_one.status == FreightStatusEnum.NOT_STARTED
 #     assert freight_two.agreed_payment == 6509.15
 
-#     assert len(truck_driver.freights) == 3
+#     assert len(truck_driver_one.freights) == 3
 
 #     freight_three = db.session.execute(
 #         db.select(Freight).order_by(Freight.created_at.desc())
@@ -725,8 +600,8 @@ def test_freights_sync_same_fields(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_delete_empty_params(client, truck_driver_joao):
-    token = create_access_token(identity=truck_driver_joao.id)
+def test_freights_delete_empty_params(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.delete(
         "/freights/",
@@ -747,8 +622,8 @@ def test_freights_delete_empty_params(client, truck_driver_joao):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_delete_all_failed(client, truck_driver_joao):
-    token = create_access_token(identity=truck_driver_joao.id)
+def test_freights_delete_all_failed(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.delete(
         "/freights/",
@@ -766,19 +641,17 @@ def test_freights_delete_all_failed(client, truck_driver_joao):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_delete_success(client, truck_driver_joao):
-    freight_one = Freight.create(**freight_one_attrs, truck_driver=truck_driver_joao)
-    freight_two = Freight.create(**freight_two_attrs, truck_driver=truck_driver_joao)
+def test_freights_delete_success(client, truck_driver_one):
+    freight_one = Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
+    freight_two = Freight.create(**freight_two_attrs, truck_driver=truck_driver_one)
 
     freight_three_attrs = freight_three_import_attrs
 
     freight_three_attrs["start_date"] = parser.parse(freight_three_attrs["start_date"])
 
-    freight_three = Freight.create(
-        **freight_three_attrs, truck_driver=truck_driver_joao
-    )
+    freight_three = Freight.create(**freight_three_attrs, truck_driver=truck_driver_one)
 
-    token = create_access_token(identity=truck_driver_joao.id)
+    token = create_access_token(identity=truck_driver_one.id)
 
     response = client.delete(
         "/freights/",
