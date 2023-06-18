@@ -1,5 +1,6 @@
 import pytest
 from src.app import create_app, db
+from src.models.truck_driver import TruckDriver
 
 
 @pytest.fixture()
@@ -39,3 +40,13 @@ def runner(app):
 def app_ctx(app):
     with app.app_context():
         yield
+
+
+@pytest.fixture()
+def truck_driver_joao():
+    return TruckDriver.create(
+        name="João",
+        email="jao@mail.com",
+        password="password",
+        password_confirmation="password",
+    )

@@ -153,6 +153,13 @@ def test_freights_sync_authorization(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
+def test_freights_delete_authorization(client):
+    response = client.delete("/freights/")
+
+    assert response.status_code == requests.codes.unauthorized
+
+
+@pytest.mark.usefixtures("app_ctx")
 def test_freights_list(client):
     truck_driver_one = TruckDriver.create(
         name="João",
@@ -674,12 +681,12 @@ def test_freights_sync_same_fields(client):
 #     import_data = [
 #         {
 #             **freight_one_attrs,
-#             "start_date": freight_one_attrs["start_date"].isoformat(),
+#             # "start_date": freight_one_attrs["start_date"],
 #             "status": FreightStatusEnum.NOT_STARTED,
 #         },
 #         {
 #             **freight_two_attrs,
-#             "start_date": freight_two_attrs["start_date"].isoformat(),
+#             # "start_date": freight_two_attrs["start_date"],
 #             "agreed_payment": 6509.15,
 #         },
 #         freight_three_import_attrs,
@@ -715,3 +722,85 @@ def test_freights_sync_same_fields(client):
 #     ).scalars()[-1]
 
 #     assert freight_three.identifier == freight_three_import_attrs["identifier"]
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_delete_empty_params(client, truck_driver_joao):
+    token = create_access_token(identity=truck_driver_joao.id)
+
+    response = client.delete(
+        "/freights/",
+        query_string={"identifiers": []},
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == requests.codes.bad_request
+    assert response.json["message"] == "Nenhum registro a remover"
+
+    response = client.delete(
+        "/freights/",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == requests.codes.bad_request
+    assert response.json["message"] == "Nenhum registro a remover"
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_delete_all_failed(client, truck_driver_joao):
+    token = create_access_token(identity=truck_driver_joao.id)
+
+    response = client.delete(
+        "/freights/",
+        query_string={
+            "identifiers": [
+                freight_one_attrs["identifier"],
+                freight_two_attrs["identifier"],
+            ]
+        },
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == requests.codes.bad_request
+    assert response.json["message"] == "Não foi possível remover nenhum registro"
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_delete_success(client, truck_driver_joao):
+    freight_one = Freight.create(**freight_one_attrs, truck_driver=truck_driver_joao)
+    freight_two = Freight.create(**freight_two_attrs, truck_driver=truck_driver_joao)
+
+    freight_three_attrs = freight_three_import_attrs
+
+    freight_three_attrs["start_date"] = parser.parse(freight_three_attrs["start_date"])
+
+    freight_three = Freight.create(
+        **freight_three_attrs, truck_driver=truck_driver_joao
+    )
+
+    token = create_access_token(identity=truck_driver_joao.id)
+
+    response = client.delete(
+        "/freights/",
+        headers={"Authorization": f"Bearer {token}"},
+        query_string={
+            "identifiers": [freight_one.identifier, freight_three.identifier]
+        },
+    )
+
+    assert response.status_code == requests.codes.ok
+    assert response.json == [freight_one.identifier, freight_three.identifier]
+
+    print(
+        "\n\n",
+        db.session.query(db.exists().where(Freight.id == freight_one.id)).scalar(),
+        "\n\n",
+    )
+
+    assert not db.session.query(
+        db.exists().where(Freight.id == freight_one.id)
+    ).scalar()
+    assert db.session.query(db.exists().where(Freight.id == freight_two.id)).scalar()
+    assert not db.session.query(
+        db.exists().where(Freight.id == freight_three.id)
+    ).scalar()
