@@ -60,7 +60,7 @@ api.add_resource(
     "/",
     endpoint="freights",
     resource_class_kwargs=group_resource_kwargs,
-    methods=["GET", "POST", "PATCH"],
+    methods=["GET", "POST", "PATCH", "DELETE"],
 )
 
 api.add_resource(

@@ -35,17 +35,27 @@ class ApplicationModel(db.Model):
 
         upsert_statement = upsert_statement.on_conflict_do_update(
             index_elements=unique_by, set_=update_columns
-        )
+        ).returning(cls.identifier)
 
-        db.session.execute(upsert_statement)
-
-        upserted_identifiers = db.session.scalars(
-            upsert_statement.returning(cls.identifier)
-        )
+        upserted_identifiers = list(db.session.execute(upsert_statement).scalars())
 
         db.session.commit()
 
-        return list(upserted_identifiers)
+        return upserted_identifiers
+
+    @classmethod
+    def destroy_by_identifiers(cls, identifiers):
+        delete_statement = (
+            db.delete(cls)
+            .where(cls.identifier.in_(identifiers))
+            .returning(cls.identifier)
+        )
+
+        deleted_identifiers = list(db.session.execute(delete_statement).scalars())
+
+        db.session.commit()
+
+        return deleted_identifiers
 
     def set_attrs(self, **kwargs):
         columns = self.__class__.columns()

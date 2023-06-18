@@ -83,9 +83,36 @@ class GroupAPI(Resource):
                 "Nenhum registro a sincronizar", requests.codes.bad_request
             )
 
-        ret = self.model.upsert(data=import_data, unique_by=["identifier"])
+        upserted_identifiers = self.model.upsert(
+            data=import_data, unique_by=["identifier"]
+        )
 
-        if len(import_data) == len(ret):
-            return make_response(ret, requests.codes.ok)
+        if len(upserted_identifiers) == 0:
+            return simple_error_response(
+                "Não foi possível remover nenhum registro", requests.codes.bad_request
+            )
 
-        return make_response(ret, requests.codes.accepted)
+        if len(import_data) == len(upserted_identifiers):
+            return make_response(upserted_identifiers, requests.codes.ok)
+
+        return make_response(upserted_identifiers, requests.codes.accepted)
+
+    def delete(self):
+        identifiers = request.args.getlist("identifiers")
+
+        if len(identifiers) == 0:
+            return simple_error_response(
+                "Nenhum registro a remover", requests.codes.bad_request
+            )
+
+        deleted_identifiers = self.model.destroy_by_identifiers(identifiers)
+
+        if len(deleted_identifiers) == 0:
+            return simple_error_response(
+                "Não foi possível remover nenhum registro", requests.codes.bad_request
+            )
+
+        if len(identifiers) == len(deleted_identifiers):
+            return make_response(deleted_identifiers, requests.codes.ok)
+
+        return make_response(deleted_identifiers, requests.codes.accepted)
