@@ -622,7 +622,7 @@ def test_freights_delete_empty_params(client, truck_driver_one):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_delete_all_failed(client, truck_driver_one):
+def test_freights_delete_all_not_found(client, truck_driver_one):
     token = create_access_token(identity=truck_driver_one.id)
 
     response = client.delete(
@@ -636,16 +636,23 @@ def test_freights_delete_all_failed(client, truck_driver_one):
         headers={"Authorization": f"Bearer {token}"},
     )
 
-    assert response.status_code == requests.codes.bad_request
-    assert response.json["message"] == "Não foi possível remover nenhum registro"
+    assert response.status_code == requests.codes.accepted
+    assert response.json["deleted"] == []
+    assert (
+        response.json["not_exists"].sort()
+        == [
+            freight_one_attrs["identifier"],
+            freight_two_attrs["identifier"],
+        ].sort()
+    )
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_freights_delete_success(client, truck_driver_one):
+def test_freights_delete_completed_success(client, truck_driver_one):
     freight_one = Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
     freight_two = Freight.create(**freight_two_attrs, truck_driver=truck_driver_one)
 
-    freight_three_attrs = freight_three_import_attrs
+    freight_three_attrs = freight_three_import_attrs.copy()
 
     freight_three_attrs["start_date"] = parser.parse(freight_three_attrs["start_date"])
 
@@ -662,12 +669,57 @@ def test_freights_delete_success(client, truck_driver_one):
     )
 
     assert response.status_code == requests.codes.ok
-    assert response.json == [freight_one.identifier, freight_three.identifier]
+    assert response.json["not_exists"] == []
+    assert (
+        response.json["deleted"].sort()
+        == [
+            freight_one.identifier,
+            freight_three.identifier,
+        ].sort()
+    )
 
-    print(
-        "\n\n",
-        db.session.query(db.exists().where(Freight.id == freight_one.id)).scalar(),
-        "\n\n",
+    assert not db.session.query(
+        db.exists().where(Freight.id == freight_one.id)
+    ).scalar()
+    assert db.session.query(db.exists().where(Freight.id == freight_two.id)).scalar()
+    assert not db.session.query(
+        db.exists().where(Freight.id == freight_three.id)
+    ).scalar()
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_delete_partial_success(client, truck_driver_one):
+    freight_one = Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
+    freight_two = Freight.create(**freight_two_attrs, truck_driver=truck_driver_one)
+
+    freight_three_attrs = freight_three_import_attrs.copy()
+
+    freight_three_attrs["start_date"] = parser.parse(freight_three_attrs["start_date"])
+
+    freight_three = Freight.create(**freight_three_attrs, truck_driver=truck_driver_one)
+
+    token = create_access_token(identity=truck_driver_one.id)
+
+    response = client.delete(
+        "/freights/",
+        headers={"Authorization": f"Bearer {token}"},
+        query_string={
+            "identifiers": [
+                freight_one.identifier,
+                freight_three.identifier,
+                "xablau-123456-78901-23456789",
+            ]
+        },
+    )
+
+    assert response.status_code == requests.codes.accepted
+    assert response.json["not_exists"] == ["xablau-123456-78901-23456789"]
+    assert (
+        response.json["deleted"].sort()
+        == [
+            freight_one.identifier,
+            freight_three.identifier,
+        ].sort()
     )
 
     assert not db.session.query(

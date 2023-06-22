@@ -107,12 +107,24 @@ class GroupAPI(Resource):
 
         deleted_identifiers = self.model.destroy_by_identifiers(identifiers)
 
-        if len(deleted_identifiers) == 0:
-            return simple_error_response(
-                "Não foi possível remover nenhum registro", requests.codes.bad_request
+        if len(identifiers) == len(deleted_identifiers):
+            return make_response(
+                {"deleted": deleted_identifiers, "not_exists": []}, requests.codes.ok
             )
 
-        if len(identifiers) == len(deleted_identifiers):
-            return make_response(deleted_identifiers, requests.codes.ok)
+        error_identifiers = set(identifiers) - set(deleted_identifiers)
 
-        return make_response(deleted_identifiers, requests.codes.accepted)
+        existing_identifiers = set(
+            db.session.execute(
+                db.select(self.model.identifier).where(
+                    self.model.identifier.in_(error_identifiers)
+                )
+            ).scalars()
+        )
+
+        not_existing_identifiers = list(error_identifiers - existing_identifiers)
+
+        return make_response(
+            {"deleted": deleted_identifiers, "not_exists": not_existing_identifiers},
+            requests.codes.accepted,
+        )
