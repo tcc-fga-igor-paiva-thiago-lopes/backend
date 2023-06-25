@@ -95,7 +95,7 @@ class GroupAPI(Resource):
         if len(import_data) == len(upserted_identifiers):
             return make_response(upserted_identifiers, requests.codes.ok)
 
-        return make_response(upserted_identifiers, requests.codes.accepted)
+        return make_response(upserted_identifiers, requests.codes.ok)
 
     def delete(self):
         identifiers = request.args.getlist("identifiers")
@@ -126,5 +126,5 @@ class GroupAPI(Resource):
 
         return make_response(
             {"deleted": deleted_identifiers, "not_exists": not_existing_identifiers},
-            requests.codes.accepted,
+            requests.codes.ok,
         )

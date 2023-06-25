@@ -636,7 +636,7 @@ def test_freights_delete_all_not_found(client, truck_driver_one):
         headers={"Authorization": f"Bearer {token}"},
     )
 
-    assert response.status_code == requests.codes.accepted
+    assert response.status_code == requests.codes.ok
     assert response.json["deleted"] == []
     assert (
         response.json["not_exists"].sort()
@@ -712,7 +712,7 @@ def test_freights_delete_partial_success(client, truck_driver_one):
         },
     )
 
-    assert response.status_code == requests.codes.accepted
+    assert response.status_code == requests.codes.ok
     assert response.json["not_exists"] == ["xablau-123456-78901-23456789"]
     assert (
         response.json["deleted"].sort()
