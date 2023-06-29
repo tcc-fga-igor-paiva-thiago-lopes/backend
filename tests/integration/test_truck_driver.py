@@ -1,7 +1,6 @@
 import pytest
 import requests
 from flask_jwt_extended import decode_token
-from src.models.truck_driver import TruckDriver
 
 
 @pytest.mark.usefixtures("app_ctx")
