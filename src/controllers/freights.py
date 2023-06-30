@@ -6,9 +6,7 @@ from src.models.freight import Freight
 from src.controllers.common.item_api import ItemAPI
 from src.controllers.common.group_api import GroupAPI
 from src.schemas.freight_schema import FreightSchema
-from src.controllers.common.utils import (
-    validation_error_response,
-)
+from src.controllers.common.utils import validation_error_response
 
 PERMITTED_PARAMS = [
     "name",
@@ -32,6 +30,7 @@ PERMITTED_PARAMS = [
     "destination_country",
     "destination_latitude",
     "destination_longitude",
+    "identifier",
 ]
 
 controller = Blueprint("freights_controller", __name__, url_prefix="/freights")
@@ -61,7 +60,7 @@ api.add_resource(
     "/",
     endpoint="freights",
     resource_class_kwargs=group_resource_kwargs,
-    methods=["GET", "POST"],
+    methods=["GET", "POST", "PATCH", "DELETE"],
 )
 
 api.add_resource(

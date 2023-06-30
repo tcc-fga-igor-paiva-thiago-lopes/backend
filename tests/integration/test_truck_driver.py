@@ -1,18 +1,10 @@
 import pytest
 import requests
 from flask_jwt_extended import decode_token
-from src.models.truck_driver import TruckDriver
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_login_success(app, client):
-    TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
+def test_login_success(client, truck_driver_one):
     params = {"email": "jao@mail.com", "password": "password"}
 
     response = client.post("/truck-drivers/login", json=params)
@@ -24,14 +16,7 @@ def test_login_success(app, client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_login_fail_wrong_password(client):
-    TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
+def test_login_fail_wrong_password(client, truck_driver_one):
     params = {"email": "jao@mail.com", "password": "passwordd"}
 
     response = client.post("/truck-drivers/login", json=params)
@@ -41,14 +26,7 @@ def test_login_fail_wrong_password(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_login_fail_email_not_registered(client):
-    TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
+def test_login_fail_email_not_registered(client, truck_driver_one):
     params = {"email": "jaoo@mail.com", "password": "password"}
 
     response = client.post("/truck-drivers/login", json=params)
@@ -61,14 +39,7 @@ def test_login_fail_email_not_registered(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_login_fail_missing_password(client):
-    TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
+def test_login_fail_missing_password(client, truck_driver_one):
     params = {"email": "jao@mail.com"}
 
     response = client.post("/truck-drivers/login", json=params)
@@ -78,14 +49,7 @@ def test_login_fail_missing_password(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_login_fail_missing_email(client):
-    TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
+def test_login_fail_missing_email(client, truck_driver_one):
     params = {"password": "password"}
 
     response = client.post("/truck-drivers/login", json=params)
@@ -95,14 +59,7 @@ def test_login_fail_missing_email(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_user_authentication(client):
-    TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
+def test_user_authentication(client, truck_driver_one):
     params = {"email": "jao@mail.com", "password": "password"}
 
     response = client.post("/truck-drivers/login", json=params)
@@ -125,14 +82,7 @@ def test_user_authentication_fail(client):
 
 
 @pytest.mark.usefixtures("app_ctx")
-def test_creation_with_duplicated_email(client):
-    TruckDriver.create(
-        name="João",
-        email="jao@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
+def test_creation_with_duplicated_email(client, truck_driver_one):
     params = {
         "name": "Carlos",
         "email": "jao@mail.com",

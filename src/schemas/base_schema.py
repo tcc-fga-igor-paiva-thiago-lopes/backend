@@ -1,5 +1,5 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
-from marshmallow import fields, EXCLUDE
+from marshmallow import fields, validate, EXCLUDE
 
 from src.app import db
 
@@ -25,6 +25,11 @@ fields.DateTime.default_error_messages.update(
 fields.String.default_error_messages.update(
     {"invalid": "Não é uma string (texto) válido"}
 )
+
+validate.Length.message_min = "Menor que o tamanho mínimo {min}"
+validate.Length.message_max = "Maior que  o tamanho máximo {max}"
+validate.Length.message_all = "Tamanho deve estar entre {min} e {max}"
+validate.Length.message_equal = "Tamanho deve ser igual a {equal}"
 
 
 class BaseSchema(SQLAlchemyAutoSchema):

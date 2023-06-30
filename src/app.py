@@ -1,4 +1,5 @@
 import requests
+import sqlalchemy
 from flask import Flask, json
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -43,6 +44,13 @@ def create_app(is_testing=False):
             response.content_type = "application/json"
 
             return response
+
+        if isinstance(e, sqlalchemy.exc.CompileError):
+            if "explicitly rendered as a boundparameter in the VALUES clause" in str(e):
+                return simple_error_response(
+                    "Ao sincronizar registros, todos devem possuir os mesmos campos",
+                    requests.codes.bad_request,
+                )
 
         return simple_error_response(
             "Erro interno do servidor", requests.codes.internal_server_error
