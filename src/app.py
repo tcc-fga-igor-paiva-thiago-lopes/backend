@@ -1,4 +1,5 @@
 import requests
+import sqlalchemy
 from flask import Flask, json
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -44,6 +45,13 @@ def create_app(is_testing=False):
 
             return response
 
+        if isinstance(e, sqlalchemy.exc.CompileError):
+            if "explicitly rendered as a boundparameter in the VALUES clause" in str(e):
+                return simple_error_response(
+                    "Ao sincronizar registros, todos devem possuir os mesmos campos",
+                    requests.codes.bad_request,
+                )
+
         return simple_error_response(
             "Erro interno do servidor", requests.codes.internal_server_error
         )
@@ -53,5 +61,9 @@ def create_app(is_testing=False):
 
     app.register_blueprint(truck_drivers_controller)
     app.register_blueprint(categories_controller)
+
+    from src.controllers.freights import controller as freights_controller
+
+    app.register_blueprint(freights_controller)
 
     return app

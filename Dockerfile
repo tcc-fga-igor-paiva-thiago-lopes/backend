@@ -7,7 +7,7 @@ WORKDIR /code
 
 USER root
 
-RUN apt update && apt install -y netcat
+RUN apt update && apt install -y netcat-traditional
 
 COPY requirements.txt ./
 
