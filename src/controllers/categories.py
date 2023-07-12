@@ -1,15 +1,24 @@
 from flask_restful import Api
 from flask import Blueprint
+from marshmallow import ValidationError
+
 from src.models.category import Category
 from src.controllers.common.item_api import ItemAPI
 from src.controllers.common.group_api import GroupAPI
+from src.controllers.common.utils import validation_error_response
 from src.schemas.category_schema import CategorySchema
 
-PERMITTED_PARAMS = ["name", "color"]
+PERMITTED_PARAMS = ["name", "color", "identifier"]
 
 controller = Blueprint("categories_controller", __name__, url_prefix="/categories")
 
 api = Api(controller)
+
+
+@controller.errorhandler(ValidationError)
+def handle_validation_error(error):
+    return validation_error_response(error, "Falha ao validar categoria")
+
 
 resource_kwargs = {
     "model": Category,
