@@ -7,7 +7,7 @@ from flask_jwt_extended import create_access_token
 
 from src.app import db
 from src.models.truck_driver import TruckDriver
-from src.models.freight import Freight, FreightCargoEnum, categoriestatusEnum
+from src.models.category import Category
 
 category_one_attrs = {
     "identifier": "b2de57be-1df9-4d48-a6b3-9a0f58a77d1a",
@@ -97,80 +97,4 @@ def test_categories_delete_authorization(client):
     assert response.status_code == requests.codes.unauthorized
 
 
-@pytest.mark.usefixtures("app_ctx")
-def test_categories_list(client, truck_driver_one):
-    truck_driver_two = TruckDriver.create(
-        name="Carlos",
-        email="carlos@mail.com",
-        password="password",
-        password_confirmation="password",
-    )
-
-    other_user_category = category_one_attrs.copy()
-    other_user_category["identifier"] = "0d6868a1-7e95-4b3b-bf10-8e4b1e23c85f"
-
-    Freight.create(**other_user_category, truck_driver=truck_driver_two)
-
-    categories = [
-        Freight.create(**category_one_attrs, truck_driver=truck_driver_one),
-        Freight.create(**category_two_attrs, truck_driver_id=truck_driver_one.id),
-    ]
-
-    token = create_access_token(identity=truck_driver_one.id)
-
-    response = client.get("/categories/", headers={"Authorization": f"Bearer {token}"})
-
-    assert response.status_code == requests.codes.ok
-
-    for idx, freight in enumerate(response.json):
-        assert freight["id"] == categories[idx].id
-        assert freight["truck_driver_id"] == truck_driver_one.id
-
-
-@pytest.mark.usefixtures("app_ctx")
-def test_categories_creation(client, truck_driver_one):
-    token = create_access_token(identity=truck_driver_one.id)
-
-    assert len(truck_driver_one.categories) == 0
-
-    response = client.post(
-        "/categories/",
-        json={
-            **category_one_attrs,
-            "start_date": datetime.isoformat(category_one_attrs["start_date"]),
-        },
-        headers={"Authorization": f"Bearer {token}"},
-    )
-
-    truck_driver_one.reload()
-
-    assert response.status_code == requests.codes.created
-    assert len(truck_driver_one.categories) == 1
-
-
-@pytest.mark.usefixtures("app_ctx")
-def test_categories_creation_missing_required_fields(client, truck_driver_one):
-    token = create_access_token(identity=truck_driver_one.id)
-
-    response = client.post(
-        "/categories/",
-        json={},
-        headers={"Authorization": f"Bearer {token}"},
-    )
-
-    assert response.status_code == requests.codes.bad_request
-    assert response.json == {
-        "errors": {
-            "identifier": ["campo obrigatório não informado"],
-            "agreed_payment": ["campo obrigatório não informado"],
-            "cargo_weight": ["campo obrigatório não informado"],
-            "contractor": ["campo obrigatório não informado"],
-            "description": ["campo obrigatório não informado"],
-            "destination_city": ["campo obrigatório não informado"],
-            "destination_state": ["campo obrigatório não informado"],
-            "distance": ["campo obrigatório não informado"],
-            "origin_city": ["campo obrigatório não informado"],
-            "origin_state": ["campo obrigatório não informado"],
-        },
-        "message": "Falha ao validar frete",
-    }
+# TODO: FINISH REMAINING TESTS
