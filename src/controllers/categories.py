@@ -8,7 +8,7 @@ from src.controllers.common.group_api import GroupAPI
 from src.controllers.common.utils import validation_error_response
 from src.schemas.category_schema import CategorySchema
 
-PERMITTED_PARAMS = ["name", "color", "identifier"]
+PERMITTED_PARAMS = ["identifier", "name", "color"]
 
 controller = Blueprint("categories_controller", __name__, url_prefix="/categories")
 

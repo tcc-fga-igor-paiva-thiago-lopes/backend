@@ -10,7 +10,7 @@ class Category(SyncableModel):
     FRIENDLY_NAME_PLURAL = "Categorias"
 
     name = db.Column(db.String(60), nullable=False, unique=True)
-    color = db.Column(LargeBinary, nullable=False)
+    color = db.Column(db.String(7), nullable=False)
 
     truck_driver_id = db.Column(
         db.BigInteger,
