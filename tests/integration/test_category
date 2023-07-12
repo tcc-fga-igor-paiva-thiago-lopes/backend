@@ -50,7 +50,7 @@ def test_categories_creation_authorization(client):
 
 @pytest.mark.usefixtures("app_ctx")
 def test_categories_update_authorization(client, truck_driver_one):
-    freight = Freight.create(**category_one_attrs, truck_driver=truck_driver_one)
+    freight = Category.create(**category_one_attrs, truck_driver=truck_driver_one)
 
     response = client.patch(
         f"/categories/{freight.id}",
@@ -62,7 +62,7 @@ def test_categories_update_authorization(client, truck_driver_one):
 
 @pytest.mark.usefixtures("app_ctx")
 def test_categories_removal_authorization(client, truck_driver_one):
-    freight = Freight.create(**category_one_attrs, truck_driver=truck_driver_one)
+    freight = Category.create(**category_one_attrs, truck_driver=truck_driver_one)
 
     response = client.delete(f"/categories/{freight.id}")
 
@@ -71,7 +71,7 @@ def test_categories_removal_authorization(client, truck_driver_one):
 
 @pytest.mark.usefixtures("app_ctx")
 def test_categories_show_authorization(client, truck_driver_one):
-    freight = Freight.create(**category_two_attrs, truck_driver=truck_driver_one)
+    freight = Category.create(**category_two_attrs, truck_driver=truck_driver_one)
 
     response = client.get(
         f"/categories/{freight.id}",
