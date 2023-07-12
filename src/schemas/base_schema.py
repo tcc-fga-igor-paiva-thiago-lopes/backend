@@ -1,7 +1,6 @@
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from marshmallow import fields, validate, EXCLUDE
 
-from src.schemas.data_types.color_field import ColorField
 from src.app import db
 
 fields.Field.default_error_messages["required"] = "campo obrigatório não informado"
@@ -25,12 +24,6 @@ fields.DateTime.default_error_messages.update(
 
 fields.String.default_error_messages.update(
     {"invalid": "Não é uma string (texto) válido"}
-)
-
-ColorField.default_error_messages.update(
-    {
-        "invalid": "Não é uma cor válida",
-    }
 )
 
 validate.Length.message_min = "Menor que o tamanho mínimo {min}"
@@ -59,7 +52,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
             return db.get_or_404(
                 model,
                 data,
-                description=f"{model.FRIENDLY_NAME_SINGULAR} não encontrado",
+                description=f"{model.FRIENDLY_NAME_SINGULAR} não encontrado(a)",
             )
 
         return super().load(data, **kwargs)
