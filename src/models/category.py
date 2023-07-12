@@ -1,5 +1,4 @@
 from src.app import db
-from sqlalchemy import LargeBinary
 from src.models.common.syncable_model import SyncableModel
 
 

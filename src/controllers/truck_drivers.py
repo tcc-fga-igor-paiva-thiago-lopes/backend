@@ -10,7 +10,6 @@ from flask import request, make_response, Blueprint
 from marshmallow import ValidationError
 from src.app import db, jwt
 from src.models.truck_driver import TruckDriver
-from src.controllers.common.group_api import GroupAPI
 from src.controllers.common.utils import (
     required_fields,
     simple_error_response,
