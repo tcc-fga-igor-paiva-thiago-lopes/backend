@@ -1,12 +1,7 @@
 import pytest
 import requests
-from dateutil import parser
 from datetime import datetime
-from werkzeug.exceptions import NotFound
-from flask_jwt_extended import create_access_token
 
-from src.app import db
-from src.models.truck_driver import TruckDriver
 from src.models.category import Category
 
 category_one_attrs = {
@@ -41,7 +36,6 @@ def test_categories_creation_authorization(client):
         "/categories/",
         json={
             **category_one_attrs,
-            "start_date": datetime.isoformat(category_one_attrs["start_date"]),
         },
     )
 
