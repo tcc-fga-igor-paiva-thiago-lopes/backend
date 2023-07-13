@@ -1,6 +1,5 @@
 import pytest
 import requests
-from datetime import datetime
 
 from src.models.category import Category
 
