@@ -66,4 +66,8 @@ def create_app(is_testing=False):
 
     app.register_blueprint(freights_controller)
 
+    from src.controllers.accounts import controller as accounts_controller
+
+    app.register_blueprint(accounts_controller)
+
     return app

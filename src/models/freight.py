@@ -68,3 +68,5 @@ class Freight(SyncableModel):
     )
 
     truck_driver = db.relationship("TruckDriver", back_populates="freights")
+
+    accounts = db.relationship("Freight", back_populates="freight")
