@@ -64,6 +64,12 @@ freight_three_import_attrs = {
     "finished_date": None,
 }
 
+other_user_freight_attrs = {
+    **freight_three_import_attrs,
+    "identifier": "6b8f3f8a-a116-4e9f-baef-3d674b9d9a29",
+    "start_date": parser.parse("2023-05-29T16:30:00.000Z"),
+}
+
 
 @pytest.mark.usefixtures("app_ctx")
 def test_freights_list_authorization(client):
@@ -649,6 +655,17 @@ def test_freights_delete_all_not_found(client, truck_driver_one):
 
 @pytest.mark.usefixtures("app_ctx")
 def test_freights_delete_completed_success(client, truck_driver_one):
+    other_truck_driver = TruckDriver(
+        name="Carlos",
+        email="carlos@mail.com",
+        password="12345678",
+        password_confirmation="12345678",
+    )
+    other_user_freight = Freight.create(
+        **other_user_freight_attrs,
+        truck_driver=other_truck_driver,
+    )
+
     freight_one = Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
     freight_two = Freight.create(**freight_two_attrs, truck_driver=truck_driver_one)
 
@@ -664,12 +681,16 @@ def test_freights_delete_completed_success(client, truck_driver_one):
         "/freights/",
         headers={"Authorization": f"Bearer {token}"},
         query_string={
-            "identifiers": [freight_one.identifier, freight_three.identifier]
+            "identifiers": [
+                freight_one.identifier,
+                freight_three.identifier,
+                other_user_freight.identifier,
+            ]
         },
     )
 
     assert response.status_code == requests.codes.ok
-    assert response.json["not_exists"] == []
+    assert response.json["not_exists"] == [other_user_freight.identifier]
     assert (
         response.json["deleted"].sort()
         == [
@@ -684,6 +705,10 @@ def test_freights_delete_completed_success(client, truck_driver_one):
     assert db.session.query(db.exists().where(Freight.id == freight_two.id)).scalar()
     assert not db.session.query(
         db.exists().where(Freight.id == freight_three.id)
+    ).scalar()
+
+    assert db.session.query(
+        db.exists().where(Freight.id == other_user_freight.id)
     ).scalar()
 
 

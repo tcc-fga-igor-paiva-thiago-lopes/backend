@@ -3,8 +3,7 @@ import requests
 from datetime import datetime
 from flask_restful import Resource
 from flask import request, make_response
-from flask_jwt_extended import current_user
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import current_user, jwt_required
 
 
 from src.app import db
@@ -105,7 +104,9 @@ class GroupAPI(Resource):
                 "Nenhum registro a remover", requests.codes.bad_request
             )
 
-        deleted_identifiers = self.model.destroy_by_identifiers(identifiers)
+        deleted_identifiers = self.model.destroy_by_identifiers(
+            identifiers, current_user
+        )
 
         if len(identifiers) == len(deleted_identifiers):
             return make_response(
@@ -117,7 +118,8 @@ class GroupAPI(Resource):
         existing_identifiers = set(
             db.session.execute(
                 db.select(self.model.identifier).where(
-                    self.model.identifier.in_(error_identifiers)
+                    self.model.truck_driver == current_user,
+                    self.model.identifier.in_(error_identifiers),
                 )
             ).scalars()
         )
