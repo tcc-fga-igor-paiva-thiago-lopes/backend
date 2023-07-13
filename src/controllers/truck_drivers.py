@@ -1,12 +1,10 @@
 import requests
 from flask_restful import Api
-from flask_jwt_extended import (
-    create_access_token,
-    jwt_required,
-)
 from sqlalchemy.exc import IntegrityError
-from flask import request, make_response, Blueprint
+from flask import request, Blueprint, make_response
 from marshmallow import ValidationError
+from flask_jwt_extended import create_access_token, jwt_required
+
 from src.app import db, jwt
 from src.models.truck_driver import TruckDriver
 from src.controllers.common.utils import (

@@ -1,7 +1,6 @@
 from src.app import db
 
 from .common.syncable_model import SyncableModel
-from .freight import Freight
 
 
 class Account(SyncableModel):
@@ -22,4 +21,4 @@ class Account(SyncableModel):
         nullable=False,
     )
 
-    freight = db.relationship(Freight, back_populates="accounts")
+    freight = db.relationship("Freight", back_populates="accounts")

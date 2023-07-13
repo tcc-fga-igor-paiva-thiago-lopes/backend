@@ -9,6 +9,7 @@ from src.schemas.account_schema import AccountSchema
 from src.controllers.common.utils import validation_error_response
 
 PERMITTED_PARAMS = [
+    "identifier",
     "name",
     "value",
     "account_date",

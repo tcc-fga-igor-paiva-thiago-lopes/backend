@@ -4,6 +4,8 @@ from src.app import db
 
 from .common.syncable_model import SyncableModel
 
+from .account import Account
+
 
 class FreightCargoEnum(str, enum.Enum):
     GENERAL = "Geral"
@@ -68,5 +70,4 @@ class Freight(SyncableModel):
     )
 
     truck_driver = db.relationship("TruckDriver", back_populates="freights")
-
-    accounts = db.relationship("Freight", back_populates="freight")
+    accounts = db.relationship(Account, back_populates="freight")
