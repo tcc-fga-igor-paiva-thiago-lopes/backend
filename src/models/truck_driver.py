@@ -5,6 +5,7 @@ from sqlalchemy.sql import func
 from .common.application_model import ApplicationModel
 
 from .freight import Freight
+from .category import Category
 
 
 class TruckDriver(ApplicationModel):
@@ -19,6 +20,7 @@ class TruckDriver(ApplicationModel):
     last_sign_in_at = db.Column(db.DateTime(timezone=True))
 
     freights = db.relationship(Freight, back_populates="truck_driver")
+    categories = db.relationship(Category, back_populates="truck_driver")
 
     def __init__(self, **kwargs):
         password = kwargs.pop("password", None)

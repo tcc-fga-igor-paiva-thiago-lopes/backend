@@ -57,8 +57,10 @@ def create_app(is_testing=False):
         )
 
     from src.controllers.truck_drivers import controller as truck_drivers_controller
+    from src.controllers.categories import controller as categories_controller
 
     app.register_blueprint(truck_drivers_controller)
+    app.register_blueprint(categories_controller)
 
     from src.controllers.freights import controller as freights_controller
 

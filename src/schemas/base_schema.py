@@ -52,7 +52,7 @@ class BaseSchema(SQLAlchemyAutoSchema):
             return db.get_or_404(
                 model,
                 data,
-                description=f"{model.FRIENDLY_NAME_SINGULAR} não encontrado",
+                description=f"{model.FRIENDLY_NAME_SINGULAR} não encontrado(a)",
             )
 
         return super().load(data, **kwargs)
