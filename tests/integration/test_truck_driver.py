@@ -12,6 +12,7 @@ def test_login_success(client, truck_driver_one):
     assert response.status_code == requests.codes.ok
 
     assert decode_token(response.json["token"])["sub"] == 1
+    assert response.json["name"] == "João"
 
 
 @pytest.mark.usefixtures("app_ctx")

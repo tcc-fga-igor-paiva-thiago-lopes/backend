@@ -74,6 +74,7 @@ def login():
 
         return make_response(
             {
+                "name": truck_driver.name,
                 "token": create_access_token(identity=truck_driver.id),
             },
             requests.codes.ok,
