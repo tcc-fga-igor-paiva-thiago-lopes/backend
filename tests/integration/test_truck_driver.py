@@ -12,6 +12,7 @@ def test_login_success(client, truck_driver_one):
     assert response.status_code == requests.codes.ok
 
     assert decode_token(response.json["token"])["sub"] == 1
+    assert response.json["name"] == "João"
 
 
 @pytest.mark.usefixtures("app_ctx")
@@ -69,8 +70,7 @@ def test_user_authentication(client, truck_driver_one):
 
     response = client.get("/truck-drivers/authenticated", headers=headers)
 
-    assert response.status_code == requests.codes.ok
-    assert response.json["id"] == 1
+    assert response.status_code == requests.codes.no_content
 
 
 @pytest.mark.usefixtures("app_ctx")

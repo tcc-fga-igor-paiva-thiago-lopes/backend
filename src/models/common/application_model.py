@@ -44,10 +44,13 @@ class ApplicationModel(db.Model):
         return upserted_identifiers
 
     @classmethod
-    def destroy_by_identifiers(cls, identifiers):
+    def destroy_by_identifiers(cls, identifiers, user):
         delete_statement = (
             db.delete(cls)
-            .where(cls.identifier.in_(identifiers))
+            .where(
+                cls.identifier.in_(identifiers),
+                cls.truck_driver == user,
+            )
             .returning(cls.identifier)
         )
 

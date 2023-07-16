@@ -1,13 +1,10 @@
 import requests
 from flask_restful import Api
-from flask_jwt_extended import (
-    create_access_token,
-    jwt_required,
-    current_user,
-)
 from sqlalchemy.exc import IntegrityError
-from flask import request, make_response, Blueprint
+from flask import request, Blueprint, make_response
 from marshmallow import ValidationError
+from flask_jwt_extended import create_access_token, jwt_required
+
 from src.app import db, jwt
 from src.models.truck_driver import TruckDriver
 from src.controllers.common.utils import (
@@ -77,6 +74,7 @@ def login():
 
         return make_response(
             {
+                "name": truck_driver.name,
                 "token": create_access_token(identity=truck_driver.id),
             },
             requests.codes.ok,
@@ -90,15 +88,7 @@ def login():
 @controller.route("/authenticated", methods=["GET"])
 @jwt_required()
 def is_authenticated():
-    return make_response({"id": current_user.id}, requests.codes.ok)
-
-
-@controller.route("/who-am-i", methods=["GET"])
-@jwt_required()
-def who_am_i():
-    return make_response(
-        {"id": current_user.id, "email": current_user.email}, requests.codes.ok
-    )
+    return make_response("", requests.codes.no_content)
 
 
 @jwt.user_lookup_loader

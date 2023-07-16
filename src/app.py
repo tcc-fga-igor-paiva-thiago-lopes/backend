@@ -9,6 +9,7 @@ from flask_jwt_extended import JWTManager
 from werkzeug.exceptions import HTTPException
 
 from src.controllers.common.utils import simple_error_response
+from src.controllers.common.exceptions import ApplicationControllerException
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -33,6 +34,10 @@ def create_app(is_testing=False):
     migrate.init_app(app, db)
     ma.init_app(app)
     jwt.init_app(app)
+
+    @app.errorhandler(ApplicationControllerException)
+    def handle_controller_error(e):
+        return simple_error_response(e.message, e.response_code)
 
     @app.errorhandler(Exception)
     def handle_exception(e):
@@ -65,5 +70,9 @@ def create_app(is_testing=False):
     from src.controllers.freights import controller as freights_controller
 
     app.register_blueprint(freights_controller)
+
+    from src.controllers.accounts import controller as accounts_controller
+
+    app.register_blueprint(accounts_controller)
 
     return app

@@ -1,11 +1,16 @@
+import requests
 from flask_restful import Api
 from flask import Blueprint
 from marshmallow import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 from src.models.category import Category
 from src.controllers.common.item_api import ItemAPI
 from src.controllers.common.group_api import GroupAPI
-from src.controllers.common.utils import validation_error_response
+from src.controllers.common.utils import (
+    validation_error_response,
+    simple_error_response,
+)
 from src.schemas.category_schema import CategorySchema
 
 PERMITTED_PARAMS = ["identifier", "name", "color"]
@@ -13,6 +18,13 @@ PERMITTED_PARAMS = ["identifier", "name", "color"]
 controller = Blueprint("categories_controller", __name__, url_prefix="/categories")
 
 api = Api(controller)
+
+
+@controller.errorhandler(IntegrityError)
+def handle_integrity_error(_):
+    return simple_error_response(
+        "Nome já cadastrado", requests.codes.unprocessable_entity
+    )
 
 
 @controller.errorhandler(ValidationError)
