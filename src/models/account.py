@@ -32,3 +32,11 @@ class Account(SyncableModel):
 
     category = db.relationship("Category")
 
+    truck_driver = db.relationship(
+        "TruckDriver",
+        secondary="FREIGHT",
+        primaryjoin="Account.freight_id == Freight.id",
+        secondaryjoin="Freight.truck_driver_id == TruckDriver.id",
+        uselist=False,
+        viewonly=True,
+    )

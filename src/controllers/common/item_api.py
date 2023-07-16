@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, current_user
 
 
 from src.controllers.common.utils import permitted_parameters
+from src.controllers.common.exceptions import RecordOwnershipException
 
 
 class ItemAPI(Resource):
@@ -22,9 +23,8 @@ class ItemAPI(Resource):
     def _get_item(self, id):
         item = self.item_schema.load(id)
 
-        # TODO: Create exception class and handle it in app.py
         if not self._user_is_owner(item):
-            raise Exception("Ação proibida")
+            raise RecordOwnershipException("Ação proibida", requests.codes.forbidden)
 
         return item
 

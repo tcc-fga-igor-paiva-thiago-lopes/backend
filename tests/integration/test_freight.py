@@ -117,6 +117,37 @@ def test_freights_removal_authorization(client, truck_driver_one):
 
 
 @pytest.mark.usefixtures("app_ctx")
+def test_freights_forbidden_removal(client, truck_driver_one):
+    truck_driver_two = TruckDriver.create(
+        name="Carlos",
+        email="carlos@mail.com",
+        password="password",
+        password_confirmation="password",
+    )
+
+    other_user_freight_attrs = freight_one_attrs.copy()
+    other_user_freight_attrs["identifier"] = "0d6868a1-7e95-4b3b-bf10-8e4b1e23c85f"
+
+    other_user_freight = Freight.create(
+        **other_user_freight_attrs, truck_driver=truck_driver_two
+    )
+
+    Freight.create(**freight_one_attrs, truck_driver=truck_driver_one)
+
+    token = create_access_token(identity=truck_driver_one.id)
+
+    response = client.delete(
+        f"/freights/{other_user_freight.id}",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == requests.codes.forbidden
+    assert response.json["message"] == "Ação proibida"
+
+    assert db.get_or_404(Freight, other_user_freight.id) is not None
+
+
+@pytest.mark.usefixtures("app_ctx")
 def test_freights_show_authorization(client, truck_driver_one):
     freight = Freight.create(**freight_two_attrs, truck_driver=truck_driver_one)
 
