@@ -14,7 +14,8 @@ PERMITTED_PARAMS = [
     "value",
     "account_date",
     "description",
-    "freight_id",
+    "freight_identifier",
+    "category_identifier",
 ]
 
 controller = Blueprint("accounts_controller", __name__, url_prefix="/accounts")

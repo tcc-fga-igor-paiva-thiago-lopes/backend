@@ -5,8 +5,8 @@ from flask_restful import Resource
 from flask import request, make_response
 from flask_jwt_extended import current_user, jwt_required
 
-
 from src.app import db
+from src.models.models import table_to_model
 from src.controllers.common.utils import permitted_parameters, simple_error_response
 
 
@@ -35,8 +35,43 @@ class GroupAPI(Resource):
 
         return db.session.execute(db.select(self.model)).scalars()
 
-    def _add_fields_to_import_data(self, data):
+    def _get_fk_table_from_column(self, col):
+        foreign_keys = list(col.foreign_keys)
+
+        if len(foreign_keys) == 0:
+            return None
+
+        return foreign_keys[0].target_fullname.split(".")[0]
+
+    def _get_tables_identifiers_map(self):
+        tables_identifier_to_id = {}
+
+        fk_tables = map(
+            self._get_fk_table_from_column,
+            filter(
+                lambda col: "truck_driver" not in col.name
+                and len(col.foreign_keys) > 0,
+                self.model.__table__.columns,
+            ),
+        )
+
+        for fk_table in fk_tables:
+            model = table_to_model[fk_table]
+
+            tables_identifier_to_id[fk_table] = model.identifier_to_id(current_user)
+
+        return tables_identifier_to_id
+
+    def _add_fields_to_import_data(self, data, identifier_to_id):
         params = permitted_parameters(data, self.permitted_params)
+
+        for key, value in params.items():
+            if "_identifier" in key:
+                fk_field = key.replace("_identifier", "_id")
+                fk_table = fk_field.split("_")[0].upper()
+
+                del params[key]
+                params[fk_field] = identifier_to_id.get(fk_table).get(value, None)
 
         if self.user_association_fk is not None:
             params[self.user_association_fk] = current_user.id
@@ -48,7 +83,9 @@ class GroupAPI(Resource):
     def _process_import_fields(self, import_data):
         return list(
             map(
-                lambda freight_data: self._add_fields_to_import_data(freight_data),
+                lambda freight_data: self._add_fields_to_import_data(
+                    freight_data, self._get_tables_identifiers_map()
+                ),
                 import_data,
             )
         )
