@@ -22,3 +22,13 @@ class Account(SyncableModel):
     )
 
     freight = db.relationship("Freight", back_populates="accounts")
+
+    category_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey("CATEGORY.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+
+    category = db.relationship("Category")
+
