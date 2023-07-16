@@ -7,7 +7,9 @@ class Config(object):
     CORS_ORIGINS = "*"
     JWT_SECRET_KEY = os.getenv("SECRET_KEY")
     JWT_ACCESS_TOKEN_EXPIRES = False
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL").replace(
+        "postgres://", "postgresql://"
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
