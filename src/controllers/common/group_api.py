@@ -64,21 +64,27 @@ class GroupAPI(Resource):
 
     def _add_fields_to_import_data(self, data, identifier_to_id):
         params = permitted_parameters(data, self.permitted_params)
+        processed_params = {}
 
         for key, value in params.items():
             if "_identifier" in key:
                 fk_field = key.replace("_identifier", "_id")
                 fk_table = fk_field.split("_")[0].upper()
 
-                del params[key]
-                params[fk_field] = identifier_to_id.get(fk_table).get(value, None)
+                processed_params[fk_field] = identifier_to_id.get(fk_table).get(
+                    value, None
+                )
+            else:
+                processed_params[key] = value
 
         if self.user_association_fk is not None:
-            params[self.user_association_fk] = current_user.id
+            processed_params[self.user_association_fk] = current_user.id
 
-        params["synced_at"] = datetime.utcnow().replace(tzinfo=pytz.utc).isoformat()
+        processed_params["synced_at"] = (
+            datetime.utcnow().replace(tzinfo=pytz.utc).isoformat()
+        )
 
-        return params
+        return processed_params
 
     def _process_import_fields(self, import_data):
         return list(
