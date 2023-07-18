@@ -40,3 +40,5 @@ class Account(SyncableModel):
         uselist=False,
         viewonly=True,
     )
+
+    __table_args__ = (db.UniqueConstraint("name", "freight_id"),)
