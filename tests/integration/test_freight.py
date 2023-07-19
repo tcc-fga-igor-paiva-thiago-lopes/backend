@@ -785,3 +785,17 @@ def test_freights_delete_partial_success(client, truck_driver_one):
     assert not db.session.query(
         db.exists().where(Freight.id == freight_three.id)
     ).scalar()
+
+
+@pytest.mark.usefixtures("app_ctx")
+def test_freights_list_authorization_user_not_found(client, truck_driver_one):
+    token = create_access_token(identity=truck_driver_one.id)
+
+    truck_driver_one.destroy()
+
+    response = client.get(
+        "/freights/",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+
+    assert response.status_code == requests.codes.unauthorized

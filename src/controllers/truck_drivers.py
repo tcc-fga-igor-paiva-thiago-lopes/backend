@@ -1,5 +1,6 @@
 import requests
 from flask_restful import Api
+from werkzeug import exceptions
 from sqlalchemy.exc import IntegrityError
 from flask import request, Blueprint, make_response
 from marshmallow import ValidationError
@@ -94,4 +95,8 @@ def is_authenticated():
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
-    return db.get_or_404(TruckDriver, identity)
+
+    try:
+        return db.get_or_404(TruckDriver, identity)
+    except exceptions.NotFound:
+        raise exceptions.Unauthorized("Conta não encontrada")
